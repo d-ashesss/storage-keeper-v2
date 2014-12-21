@@ -1,0 +1,14 @@
+{
+	"name": "storage-keeper",
+	"main": "index.html",
+	"version": "2",
+	"single-instance": false,
+	"window": {
+		"toolbars": false,
+		"min_width_": 800,
+		"min_height_": 600
+	},
+	"webkit": {
+		"plugin": true
+	}
+}
