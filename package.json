@@ -5,8 +5,10 @@
 	"single-instance": false,
 	"window": {
 		"toolbars": false,
-		"min_width_": 800,
-		"min_height_": 600
+		"width": 800,
+		"height": 600,
+		"min_width": 800,
+		"min_height": 600
 	},
 	"webkit": {
 		"plugin": true
