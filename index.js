@@ -4,20 +4,17 @@ var PINNED_DIRS_LIST = "pinnedDirs-dev";
 
 var _ = require("underscore");
 
-var storage = require("./app/storage");
-var storage_list = require("./app/storage/list");
+var list = require("./app/list");
 
 var recent_dirs_list;
 var pinned_dirs_list;
 var $recent_dirs_list, $pinned_dirs_list;
 
 $(function() {
-	storage.init(localStorage);
-
-	recent_dirs_list = storage_list.get(RECENT_DIRS_LIST, { addToHead: true, maxSize: 15 });
+	recent_dirs_list = list.get_from_storage(localStorage, RECENT_DIRS_LIST, { addToHead: true, maxSize: 15 });
 	$recent_dirs_list = $("#recent_dirs").find(".list").hide();
 
-	pinned_dirs_list = storage_list.get(PINNED_DIRS_LIST);
+	pinned_dirs_list = list.get_from_storage(localStorage, PINNED_DIRS_LIST);
 	$pinned_dirs_list = $("#pinned_dirs").find(".list").hide();
 
 	init_window();
@@ -69,14 +66,14 @@ function init_window() {
 	var gui = require("nw.gui");
 	var wnd = gui.Window.get();
 
-	if (storage.get(WINDOW_MAXIMIZE, false)) {
+	if (localStorage.getItem(WINDOW_MAXIMIZE)) {
 		wnd.maximize();
 	}
 	wnd.on("maximize", function() {
-		storage.set(WINDOW_MAXIMIZE, true);
+		localStorage.setItem(WINDOW_MAXIMIZE, true);
 	});
 	wnd.on("unmaximize", function() {
-		storage.remove(WINDOW_MAXIMIZE);
+		localStorage.removeItem(WINDOW_MAXIMIZE);
 	});
 }
 

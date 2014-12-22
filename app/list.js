@@ -1,23 +1,28 @@
-var storage = require("../storage");
 var _ = require("underscore");
 
 /**
+ * @param {Storage} storage
  * @param {string} name
  * @param {object=} options
  * @returns {List}
  */
-function get_list(name, options) {
-	var list = storage.get(name, "[]");
-	return new List(name, list, options);
-}
-exports.get = get_list;
+exports.get_from_storage = function(storage, name, options) {
+	var list = new List(name, options);
+	var list_data = storage.getItem(name);
+	list.setData(list_data);
+	list.setStorage(storage);
+	return list;
+};
 
-function List(name, list, options) {
+/**
+ * @param name
+ * @param options
+ * @constructor
+ */
+function List(name, options) {
 	this.name = name;
-	if (typeof list == "string") {
-		list = JSON.parse(list);
-	}
-	this.list = list;
+	this.list = [];
+
 	if (typeof options == "object") {
 		this.options = _.extend({}, this.options, options);
 	}
@@ -32,6 +37,24 @@ List.prototype = {
 	options: {
 		addToHead: false,
 		maxSize: 0
+	},
+	/** @type {Storage} */
+	storage: null,
+
+	/**
+	 * @param {Storage} storage
+	 */
+	setStorage: function(storage) {
+		this.storage = storage;
+	},
+
+	setData: function(data) {
+		if (typeof data == "string") {
+			data = JSON.parse(data);
+		}
+		if (data != null) {
+			this.list = data;
+		}
 	},
 
 	/**
@@ -91,12 +114,6 @@ List.prototype = {
 		}
 	},
 
-	afterAdd: function() {
-		if (this.options.maxSize > 0) {
-			this.list.splice(this.options.maxSize);
-		}
-	},
-
 	remove: function(value) {
 		var pos = this.indexOf(value);
 		if (pos >= 0) {
@@ -117,7 +134,10 @@ List.prototype = {
 	},
 
 	save: function() {
+		if (this.storage == null) {
+			return;
+		}
 		var value = JSON.stringify(this.list);
-		storage.set(this.name, value);
+		this.storage.setItem(this.name, value);
 	}
 };
