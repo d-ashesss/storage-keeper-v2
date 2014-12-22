@@ -1,0 +1,58 @@
+body {
+	font-family: "Noto Sans", Verdana, sans-serif;
+	margin: 0;
+	color: rgba(0, 0, 0, 0.87);
+	overflow: hidden;
+	background-color: #CFD8DC;
+}
+
+.hidden {
+	display: none;
+}
+
+.action-link {
+	color: #607D8B;
+	cursor: pointer;
+	border-bottom: 1px solid #607D8B;
+	padding: 0 1px;
+}
+
+.action-link:hover {
+	border-bottom-color: #CFD8DC;
+}
+
+.action-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 3px;
+	cursor: pointer;
+	opacity: .5;
+}
+
+.action-icon:hover {
+	opacity: 1;
+}
+
+.pin {
+	background-image: url("../img/pin.png");
+}
+
+.remove {
+	background-image: url("../img/remove.png");
+}
+
+button {
+	text-transform: uppercase;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
+	border: none;
+	background-color: #455A64;
+	font-weight: bold;
+	padding: 10px 20px;
+	color: #FFF;
+}
+
+button:hover {
+	background-color: #607D8B;
+	cursor: pointer;
+}

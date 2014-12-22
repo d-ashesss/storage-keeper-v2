@@ -1,7 +1,7 @@
 {
 	"name": "storage-keeper",
 	"main": "index.html",
-	"version": "2",
+	"version": "2.0.0",
 	"single-instance": false,
 	"window": {
 		"toolbars": false,
@@ -10,5 +10,8 @@
 	},
 	"webkit": {
 		"plugin": true
+	},
+	"dependencies": {
+		"underscore": "*"
 	}
 }
