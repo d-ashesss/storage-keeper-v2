@@ -15,17 +15,22 @@ exports.get_from_storage = function(storage, name, options) {
 };
 
 /**
- * @param name
- * @param options
+ * @param {string=} name
+ * @param {object=} options
+ * @returns {List}
  * @constructor
  */
 function List(name, options) {
+	if (!(this instanceof List)) {
+		return new List(name, options);
+	}
 	this.name = name;
 	this.list = [];
 
-	if (typeof options == "object") {
-		this.options = _.extend({}, this.options, options);
+	if (typeof options != "object") {
+		options = {}
 	}
+	this.options = _.extend({}, this.options, options);
 }
 exports.List = List;
 
@@ -36,10 +41,12 @@ List.prototype = {
 	list: null,
 	options: {
 		addToHead: false,
-		maxSize: 0
+		maxSize: 0,
+		unique: false
 	},
 	/** @type {Storage} */
 	storage: null,
+	position: -1,
 
 	/**
 	 * @param {Storage} storage
@@ -54,6 +61,9 @@ List.prototype = {
 		}
 		if (data != null) {
 			this.list = data;
+		}
+		if (this.length() > 0) {
+			this.position = 0;
 		}
 	},
 
@@ -79,6 +89,9 @@ List.prototype = {
 	},
 
 	unshift: function(value) {
+		if (this.options.unique) {
+			this.remove(value);
+		}
 		this.list.unshift(value);
 		if (this.options.maxSize > 0) {
 			this.list.splice(this.options.maxSize);
@@ -93,6 +106,9 @@ List.prototype = {
 	},
 
 	push: function(value) {
+		if (this.options.unique) {
+			this.remove(value);
+		}
 		this.list.push(value);
 		if (this.options.maxSize > 0) {
 			this.list = this.list.splice(-this.options.maxSize);
@@ -112,6 +128,7 @@ List.prototype = {
 		} else {
 			this.push(value);
 		}
+		this.position = this.indexOf(value);
 	},
 
 	remove: function(value) {
@@ -124,13 +141,57 @@ List.prototype = {
 
 	/**
 	 * @param value
-	 * @param {List=} to_list
+	 * @param {List} to_list
 	 */
 	move: function(value, to_list) {
 		this.remove(value);
-		if (typeof to_list != "undefined") {
-			to_list.add(value);
+		to_list.add(value);
+	},
+
+	length: function() {
+		return this.list.length;
+	},
+
+	current: function() {
+		if (this.position < 0) {
+			return null;
 		}
+		return this.list[this.position];
+	},
+
+	first: function() {
+		if (this.length() > 0) {
+			this.position = 0;
+		}
+		return this.current();
+	},
+
+	last: function() {
+		if (this.length() > 0) {
+			this.position = this.length() - 1;
+		}
+		return this.current();
+	},
+
+	prev: function() {
+		if (this.position > 0) {
+			this.position--;
+		}
+		return this.current();
+	},
+
+	next: function() {
+		if (this.position < (this.length() - 1)) {
+			this.position++;
+		}
+		return this.current();
+	},
+
+	random: function() {
+		if (this.length() > 0) {
+			this.position = Math.floor(Math.random() * this.length());
+		}
+		return this.current();
 	},
 
 	save: function() {

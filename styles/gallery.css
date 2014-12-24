@@ -1,0 +1,14 @@
+.media {
+	margin: 0 auto;
+	border: none;
+	display: block;
+}
+
+#current_image {
+	filter: FlipH;
+}
+
+#current_flash, #current_video {
+	padding-left: 200px;
+	padding-top: 46px;
+}
