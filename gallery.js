@@ -15,7 +15,10 @@ var history;
 
 /** @type {Image} */
 var image;
+var image_preload = $("<img>");
+/** @type {Frame} */
 var frame;
+/** @type {Video} */
 var video;
 
 $(function() {
@@ -164,5 +167,10 @@ function show(direction) {
 		image.show(current_image);
 		video.hide();
 		frame.hide();
+	}
+
+	var next_image = images_list.getNext();
+	if (next_image != null) {
+		image_preload.attr("src", next_image);
 	}
 }

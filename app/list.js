@@ -187,6 +187,13 @@ List.prototype = {
 		return this.current();
 	},
 
+	getNext: function() {
+		if (this.length() > 0 && this.position < (this.length() - 1)) {
+			return this.list[this.position + 1];
+		}
+		return null;
+	},
+
 	random: function() {
 		if (this.length() > 0) {
 			this.position = Math.floor(Math.random() * this.length());
