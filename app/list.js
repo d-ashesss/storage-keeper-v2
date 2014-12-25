@@ -201,6 +201,10 @@ List.prototype = {
 		return this.current();
 	},
 
+	getPosition: function(zero_base) {
+		return this.position + (zero_base ? 1 : 0);
+	},
+
 	save: function() {
 		if (this.storage == null) {
 			return;

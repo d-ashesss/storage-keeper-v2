@@ -1,3 +1,25 @@
+.overlay {
+	position: absolute;
+	margin: 10px;
+	z-index: 1000;
+	top: 0;
+}
+
+.overlay .panel {
+	background-color: #FAFAFA;
+	padding: 10px 20px;
+	font-size: 12px;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
+	white-space: nowrap;
+	margin: 0 10px 10px 0;
+	display: inline-block;
+	vertical-align: top;
+}
+
+#current_file_name, #current_file_number {
+	margin-right: 10px;
+}
+
 .media {
 	margin: 0 auto;
 	border: none;
@@ -5,10 +27,11 @@
 }
 
 #current_image {
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
 	filter: FlipH;
 }
 
-#current_frame, #current_video {
+#current_frame {
 	box-sizing: border-box;
 	padding-left: 200px;
 	padding-top: 46px;

@@ -1,6 +1,8 @@
 var OPEN_DIR = "open-dir";
 var HISTORY_NAME = "gallery-history";
 
+var node_path = require("path");
+
 var list = require("./app/list");
 var gallery = require("./app/gallery");
 
@@ -22,9 +24,13 @@ var frame;
 var video;
 
 $(function() {
-	image = new Image($("#current_image"));
+	image = new Image($("#current_image"), {
+		onSizeCallback: onObjectSize
+	});
 	frame = new Frame($("#current_frame"));
-	video = new Video($("#current_video"));
+	video = new Video($("#current_video"), {
+		onSizeCallback: onObjectSize
+	});
 
 	var dir = sessionStorage.getItem(OPEN_DIR);
 	if (!dir) {
@@ -67,6 +73,7 @@ $(function() {
 			} else if (event.keyCode == 122 /* F11 */) {
 			} else if (event.keyCode == 107 /* numpad plus */) {
 			} else if (event.keyCode == 192 /* tilda */) {
+				$(".overlay").fadeToggle("fast");
 			} else if (event.keyCode == 45 /* insert */) {
 			} else if (event.keyCode == 46 /* delete */) {
 			} else {
@@ -95,6 +102,13 @@ function resize() {
 	image.setSize(window.innerWidth, window.innerHeight);
 	video.setSize(window.innerWidth, window.innerHeight);
 	frame.setSize(window.innerWidth, window.innerHeight);
+}
+
+function onObjectSize(naturalWidth, naturalHeight, actualWidth, actualHeight) {
+	var natural = naturalWidth * naturalHeight;
+	var actual = actualWidth * actualHeight;
+	var scale = actual / natural * 100;
+	$("#current_file_size").text(naturalWidth + '×' + naturalHeight + ' ' + scale.toFixed(0) + '%');
 }
 
 /**
@@ -168,6 +182,10 @@ function show(direction) {
 		video.hide();
 		frame.hide();
 	}
+
+	$("#current_file_name").text(node_path.basename(current_image));
+	$("#current_file_number").text(images_list.getPosition(true) + "/" + images_list.length());
+	$("#current_file_size").text('-');
 
 	var next_image = images_list.getNext();
 	if (next_image != null) {

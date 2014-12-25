@@ -31,6 +31,8 @@ Image.prototype = {
 	height: 0,
 
 	options: {
+		/** @type {function} */
+		onSizeCallback: null
 	},
 
 	onload: function() {
@@ -39,6 +41,12 @@ Image.prototype = {
 			this.$image.css("margin-top", margin / 2);
 		} else {
 			this.$image.css("margin-top", 0);
+		}
+		if (this.$image.is(":visible") && typeof this.options.onSizeCallback == "function") {
+			this.options.onSizeCallback.call(this,
+				this.image.naturalWidth, this.image.naturalHeight,
+				this.$image.width(), this.$image.height()
+			);
 		}
 	},
 
@@ -51,6 +59,7 @@ Image.prototype = {
 			maxWidth: this.width = width,
 			maxHeight: this.height = height
 		});
+		this.onload();
 	},
 
 	show: function(file) {

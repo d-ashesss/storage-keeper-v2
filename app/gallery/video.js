@@ -19,7 +19,10 @@ function Video($video, options) {
 		if (v.options.loop) {
 			v.play();
 		}
-	})
+	});
+	this.video.addEventListener("canplay", function() {
+		v.onload();
+	});
 }
 module.exports = Video;
 
@@ -34,7 +37,32 @@ Video.prototype = {
 
 	options: {
 		autoplay: true,
-		loop: true
+		loop: true,
+		/** @type {function} */
+		onSizeCallback: null
+	},
+
+	onload: function() {
+		var margin = this.height - this.video.videoHeight;
+		if (margin > 0) {
+			this.$video.css({
+				width: this.video.videoWidth,
+				height: this.video.videoHeight,
+				"margin-top": margin / 2
+			});
+		} else {
+			this.$video.css({
+				width: this.width,
+				height: this.height,
+				"margin-top": 0
+			});
+		}
+		if (this.$video.is(":visible") && typeof this.options.onSizeCallback == "function") {
+			this.options.onSizeCallback.call(this,
+				this.video.videoWidth, this.video.videoHeight,
+				this.$video.width(), this.$video.height()
+			);
+		}
 	},
 
 	setFile: function(file) {
@@ -46,11 +74,10 @@ Video.prototype = {
 
 	setSize: function(width, height) {
 		this.$video.css({
-			width: this.width = width,
-			height: this.height = height
+			maxWidth: this.width = width,
+			maxHeight: this.height = height
 		});
-		//this.$video.width(this.width = width);
-		//this.$video.height(this.height = height);
+		this.onload();
 	},
 
 	play: function() {
