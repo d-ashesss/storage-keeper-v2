@@ -5,6 +5,9 @@ var list = require("./app/list");
 var gallery = require("./app/gallery");
 
 var Image = require("./app/gallery/image");
+var Frame = require("./app/gallery/frame");
+var Video = require("./app/gallery/video");
+
 /** @type {List} */
 var images_list;
 /** @type {List} */
@@ -12,13 +15,13 @@ var history;
 
 /** @type {Image} */
 var image;
-//var video;
-//var flash;
+var frame;
+var video;
 
 $(function() {
 	image = new Image($("#current_image"));
-	//video =
-	//flash =
+	frame = new Frame($("#current_frame"));
+	video = new Video($("#current_video"));
 
 	var dir = sessionStorage.getItem(OPEN_DIR);
 	if (!dir) {
@@ -87,10 +90,8 @@ $(function() {
 
 function resize() {
 	image.setSize(window.innerWidth, window.innerHeight);
-	$("#current_flash, #current_video").css({
-		width: window.innerWidth - 200,
-		height: window.innerHeight - 46
-	});
+	video.setSize(window.innerWidth, window.innerHeight);
+	frame.setSize(window.innerWidth, window.innerHeight);
 }
 
 /**
@@ -151,5 +152,17 @@ function show(direction) {
 		history.add(current_image);
 	}
 
-	image.show(current_image);
+	if (/\.(webm|mp4)$/i.test(current_image)) {
+		video.show(current_image);
+		image.hide();
+		frame.hide();
+	} else if (/\.swf$/i.test(current_image)) {
+		frame.show(current_image);
+		image.hide();
+		video.hide();
+	} else {
+		image.show(current_image);
+		video.hide();
+		frame.hide();
+	}
 }

@@ -43,7 +43,7 @@ Image.prototype = {
 	},
 
 	setFile: function(file) {
-		this.$image.attr("src", file);
+		this.image.src = file;
 	},
 
 	setSize: function(width, height) {

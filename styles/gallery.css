@@ -8,7 +8,8 @@
 	filter: FlipH;
 }
 
-#current_flash, #current_video {
+#current_frame, #current_video {
+	box-sizing: border-box;
 	padding-left: 200px;
 	padding-top: 46px;
 }
