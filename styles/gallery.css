@@ -16,8 +16,48 @@
 	vertical-align: top;
 }
 
-#current_file_name, #current_file_number {
+#new_tag_form {
+	margin-bottom: 10px;
+}
+
+#new_tag_form input {
+	margin-bottom: 5px;
+	width: 160px;
+	box-sizing: border-box;
+}
+
+#keymap .tag {
+	margin-bottom: 1px;
+	width: 160px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#keymap .tag.current {
+	font-weight: bold;
+}
+
+#keymap .tag.current .key {
+	font-weight: normal;
+	background-color: #455A64;
+}
+
+#keymap .tag .key {
+	padding: 2px;
+	background-color: #607D8B;
+	color: #FAFAFA;
+	display: inline-block;
+	width: 20px;
+	text-align: center;
+	margin-right: 5px;
+}
+
+#current_file_stats > span {
 	margin-right: 10px;
+}
+
+#current_file_stats > span:last-child {
+	margin-right: 0;
 }
 
 .media {
@@ -33,6 +73,6 @@
 
 #current_frame {
 	box-sizing: border-box;
-	padding-left: 200px;
-	padding-top: 46px;
+	padding-left: 220px;
+	padding-top: 57px;
 }

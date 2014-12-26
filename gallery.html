@@ -9,6 +9,12 @@
 
 <div class=overlay>
 	<div class=panel>
+		<form id=new_tag_form>
+			<label><input name=tag_name type=text placeholder="New Tag"></label>
+		</form>
+		<div id=keymap></div>
+	</div>
+	<div id=current_file_stats class=panel>
 		<span id=current_file_name></span>
 		<span id=current_file_number></span>
 		<span id=current_file_size></span>
@@ -17,4 +23,4 @@
 
 <img src="" id=current_image class=media>
 <iframe id=current_frame class=media frameborder=no></iframe>
-<video id=current_video class=media controls=controls></video>
+<video id=current_video class=media controls=controls muted=muted></video>
