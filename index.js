@@ -62,6 +62,9 @@ $(function() {
 
 function init_window() {
 	var gui = require("nw.gui");
+	/**
+	 * @type {{Window: {maximize: function}}}
+	 */
 	var wnd = gui.Window.get();
 
 	if (localStorage.getItem(WINDOW_MAXIMIZE)) {

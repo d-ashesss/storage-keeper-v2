@@ -111,6 +111,9 @@ $(function() {
 				loadImages();
 			} else if (event.keyCode == 122 /* F11 */) {
 				var gui = require("nw.gui");
+				/**
+				 * @type {{Window: {toggleFullscreen: function}}}
+				 */
 				var wnd = gui.Window.get();
 				wnd.toggleFullscreen()
 			} else if (event.keyCode == 107 /* numpad plus */) {
