@@ -16,6 +16,12 @@
 	vertical-align: top;
 }
 
+.fatal_error {
+	display: block !important;
+	background-color: #FFCCBC !important;
+	cursor: default;
+}
+
 #new_tag_form {
 	margin-bottom: 10px;
 }

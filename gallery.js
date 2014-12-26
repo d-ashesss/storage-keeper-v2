@@ -33,6 +33,19 @@ var frame;
 /** @type {Video} */
 var video;
 
+process.on("uncaughtException", function(/** @type {Error} */ error) {
+	var $error_container = $(".panel.fatal_error");
+	if ($error_container.length == 0) {
+		$error_container = $("<div>", { class: "panel fatal_error" }).prependTo("#overlay").click(function() {
+			$(this).remove();
+		});
+	}
+	$error_container.empty();
+	_.each(error["stack"].split(/\n/), function(line) {
+		return $("<div>").text(line).appendTo($error_container);
+	});
+});
+
 $(function() {
 	image = new Image($("#current_image"), {
 		onSizeCallback: onObjectSize
@@ -126,7 +139,7 @@ $(function() {
 				wnd.toggleFullscreen()
 			} else if (event.keyCode == 107 /* numpad plus */) {
 			} else if (event.keyCode == 192 /* tilda */) {
-				$(".overlay").fadeToggle("fast");
+				$("#overlay").fadeToggle("fast");
 			} else if (event.keyCode == 45 /* insert */) {
 				if (typeof current_tag_index != "undefined") {
 					tag_counts[current_tag_index]--;
