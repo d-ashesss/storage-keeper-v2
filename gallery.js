@@ -43,7 +43,7 @@ $(function() {
 	});
 	$("#new_tag_form").submit(function(event) {
 		event.preventDefault();
-		var new_tag = this["tag_name"].value.replace(/[^0-9a-z_\-]/ig, '');
+		var new_tag = this["tag_name"].value.replace(/[^0-9a-z\-]/ig, '');
 		if (new_tag.length > 0 && tags_list.indexOf(new_tag) < 0) {
 			tags_list.push(new_tag);
 			drawKeymap();
@@ -89,6 +89,14 @@ $(function() {
 			} else if (event.shiftKey && event.keyCode == 187 /* equal */) {
 				$("#new_tag_form").find("input").focus();
 			} else if (event.keyCode == 13 /* enter */) {
+				var mode = BUILD.VIEWED;
+				if (event.shiftKey) {
+					mode = BUILD.TAGGED;
+				} else if (event.ctrlKey) {
+					mode = BUILD.ALL;
+				}
+				gallery.save(current_dir, build(mode));
+				loadImages();
 			} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 				return;
 			} else if (event.keyCode == 32 /* space */ || event.keyCode == 34 /* pgdown */) {
@@ -321,4 +329,31 @@ function show(direction) {
 		image_preload.attr("src", next_image);
 	}
 	drawKeymap();
+}
+
+/**
+ * @enum
+ */
+var BUILD = {
+	ALL: 0,
+	TAGGED: 1,
+	VIEWED: 2
+};
+
+function build(mode) {
+	var count = sorted_images.length;
+	if (mode == BUILD.ALL) {
+		count = images_list.length();
+	}
+
+	var result = {};
+	for (var i = 0; i < count; i++) {
+		var image = images_list.at(i);
+		if (typeof sorted_images[i] != "undefined") {
+			result[image] = tags_list[sorted_images[i]];
+		} else if (mode == BUILD.VIEWED || mode == BUILD.ALL) {
+			result[image] = "_";
+		}
+	}
+	return result;
 }

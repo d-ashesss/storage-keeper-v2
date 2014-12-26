@@ -18,7 +18,7 @@ exports.getImages = function(path, callback) {
 };
 
 exports.getTags = function(path, callback) {
-	var tags = node_path.basename(path).split(" ");
+	var pre_tags = node_path.basename(path).split(" ");
 	fs.readdir(path, function(err, files) {
 		var dirs = _.filter(files, function(file) {
 			var ext = node_path.extname(file).toLowerCase();
@@ -32,9 +32,23 @@ exports.getTags = function(path, callback) {
 			} catch(e) {}
 			return false;
 		});
-		tags = _.filter(tags.concat(dirs), function(tag) {
-			return /^[a-z0-9_\-]+$/i.test(tag);
+		var tags = [];
+		_.each(pre_tags.concat(dirs), function(tag) {
+			if (tags.indexOf(tag) < 0 && /^[a-z0-9\-]+$/i.test(tag)) {
+				tags.push(tag);
+			}
 		});
 		callback(tags);
 	});
+};
+
+exports.save = function(path, images) {
+	_.each(images, function(tag, src_path) {
+		var tag_path = path + "/" + tag;
+		var dst_path = tag_path + "/" + node_path.basename(src_path);
+		if (!fs.existsSync(tag_path)) {
+			fs.mkdirSync(tag_path);
+		}
+		fs.renameSync(src_path, dst_path);
+	})
 };
