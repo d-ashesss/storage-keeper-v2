@@ -62,11 +62,16 @@ Image.prototype = {
 		this.onload();
 	},
 
-	show: function(file) {
+	show: function(file, allow_flip) {
 		if (file) {
 			this.setFile(file);
 		}
 		this.$image.show();
+		if (allow_flip && Math.round(Math.random()) == 1) {
+			this.$image.css("-webkit-transform", "scaleX(-1)")
+		} else {
+			this.$image.css("-webkit-transform", "scaleX(1)")
+		}
 	},
 
 	hide: function() {

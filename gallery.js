@@ -16,7 +16,7 @@ var current_dir;
 /** @type {List} */
 var images_list;
 /** @type {List} */
-var history;
+var view_history;
 
 //          Q   A   W   S   E   D   R   F   Z   X   C   V   1   2   3   4
 var keys = [81, 65, 87, 83, 69, 68, 82, 70, 90, 88, 67, 86, 49, 50, 51, 52];
@@ -184,7 +184,7 @@ function loadImages() {
 		images_list.setData(images);
 
 		var history_name = HISTORY_NAME + "-" + current_dir;
-		history = list.get_from_storage(localStorage, history_name, {
+		view_history = list.get_from_storage(localStorage, history_name, {
 			maxSize: Math.round(images_list.length() / 2),
 			unique: true
 		});
@@ -286,24 +286,24 @@ function show(direction) {
 		break;
 
 	case SHOW.RANDOM:
-		while (history.contains(current_image)) {
+		while (view_history.contains(current_image)) {
 			current_image = images_list.random();
 		}
 		break;
 
 	case SHOW.HISTORY_PREV:
-		current_image = history.prev();
+		current_image = view_history.prev();
 		break;
 
 	case SHOW.HISTORY_NEXT:
-		current_image = history.next();
+		current_image = view_history.next();
 		break;
 
 	default:
 	}
 
 	if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
-		history.add(current_image);
+		view_history.add(current_image);
 	}
 
 	if (/\.(webm|mp4)$/i.test(current_image)) {
@@ -315,7 +315,7 @@ function show(direction) {
 		image.hide();
 		video.hide();
 	} else {
-		image.show(current_image);
+		image.show(current_image, direction == SHOW.RANDOM);
 		video.hide();
 		frame.hide();
 	}
