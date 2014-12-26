@@ -11,6 +11,8 @@ var Image = require("./app/gallery/image");
 var Frame = require("./app/gallery/frame");
 var Video = require("./app/gallery/video");
 
+var current_dir;
+
 /** @type {List} */
 var images_list;
 /** @type {List} */
@@ -50,8 +52,8 @@ $(function() {
 		this["tag_name"].blur();
 	});
 
-	var dir = sessionStorage.getItem(OPEN_DIR);
-	if (!dir) {
+	current_dir = sessionStorage.getItem(OPEN_DIR);
+	if (!current_dir) {
 		window.location = "index.html";
 		return;
 	}
@@ -106,7 +108,11 @@ $(function() {
 			} else if (event.keyCode == 27 /* esc */) {
 				window.location = "index.html";
 			} else if (event.keyCode == 116 /* F5 */) {
+				loadImages();
 			} else if (event.keyCode == 122 /* F11 */) {
+				var gui = require("nw.gui");
+				var wnd = gui.Window.get();
+				wnd.toggleFullscreen()
 			} else if (event.keyCode == 107 /* numpad plus */) {
 			} else if (event.keyCode == 192 /* tilda */) {
 				$(".overlay").fadeToggle("fast");
@@ -145,19 +151,7 @@ $(function() {
 		})
 		.resize(resize).triggerHandler("resize");
 
-	gallery.getImages(dir, function(images) {
-		images_list = list.List();
-		images_list.setData(images);
-
-		var history_name = HISTORY_NAME + "-" + dir;
-		history = list.get_from_storage(localStorage, history_name, {
-			maxSize: Math.round(images_list.length() / 2),
-			unique: true
-		});
-
-		loadTags(dir);
-		show();
-	});
+	loadImages();
 });
 
 function resize() {
@@ -173,10 +167,39 @@ function onObjectSize(naturalWidth, naturalHeight, actualWidth, actualHeight) {
 	$("#current_file_size").text(naturalWidth + '×' + naturalHeight + ' ' + scale.toFixed(0) + '%');
 }
 
-function loadTags(dir) {
+function loadImages() {
+	reset();
+	gallery.getImages(current_dir, function(images) {
+		images_list.setData(images);
+
+		var history_name = HISTORY_NAME + "-" + current_dir;
+		history = list.get_from_storage(localStorage, history_name, {
+			maxSize: Math.round(images_list.length() / 2),
+			unique: true
+		});
+
+		loadTags();
+		show();
+	});
+}
+
+function reset() {
+	image.setFile("");
+	frame.setFile("");
+	video.setFile("");
+
+	$("#current_file_name").text("No image loaded");
+	$("#current_file_number").text("");
+	$("#current_file_size").text("");
+
+	images_list = list.List();
+	tags_list = [];
 	sorted_images = [];
 	tag_counts = _.map(keys, function() {return 0});
-	gallery.getTags(dir, function(tags) {
+}
+
+function loadTags() {
+	gallery.getTags(current_dir, function(tags) {
 		tags_list = tags;
 		drawKeymap();
 	});
