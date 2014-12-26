@@ -66,7 +66,10 @@ Video.prototype = {
 	},
 
 	setFile: function(file) {
-		this.video.src = file;
+		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "nw:blank";
+		if (this.video.src != file_url) {
+			this.video.src = file_url;
+		}
 		if (file && this.options.autoplay) {
 			this.play();
 		}
@@ -89,14 +92,12 @@ Video.prototype = {
 	},
 
 	show: function(file) {
-		if (file) {
-			this.setFile(file);
-		}
+		this.setFile(file);
 		this.$video.show();
 	},
 
 	hide: function() {
-		this.setFile("");
+		this.setFile(null);
 		this.$video.hide();
 	}
 };

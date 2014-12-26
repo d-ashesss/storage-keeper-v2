@@ -51,7 +51,14 @@ Image.prototype = {
 	},
 
 	setFile: function(file) {
-		this.image.src = file;
+		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "img/blank.png";
+		if (this.image.src != file_url) {
+			this.image.src = file_url;
+		} else {
+			setTimeout(function(i) {
+				i.onload();
+			}, 1, this);
+		}
 	},
 
 	setSize: function(width, height) {
@@ -63,9 +70,7 @@ Image.prototype = {
 	},
 
 	show: function(file, allow_flip) {
-		if (file) {
-			this.setFile(file);
-		}
+		this.setFile(file);
 		this.$image.show();
 		if (allow_flip && Math.round(Math.random()) == 1) {
 			this.$image.css("-webkit-transform", "scaleX(-1)")

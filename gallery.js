@@ -208,9 +208,9 @@ function loadImages() {
 }
 
 function reset() {
-	image.setFile("");
-	frame.setFile("");
-	video.setFile("");
+	image.setFile(null);
+	frame.setFile(null);
+	video.setFile(null);
 
 	$("#current_file_name").text("No image loaded");
 	$("#current_file_number").text("");
@@ -327,6 +327,7 @@ function show(direction) {
 		frame.show(current_image);
 		image.hide();
 		video.hide();
+		$("#current_file_size").text('-');
 	} else {
 		image.show(current_image, direction == SHOW.RANDOM);
 		video.hide();
@@ -335,10 +336,9 @@ function show(direction) {
 
 	$("#current_file_name").text(node_path.basename(current_image));
 	$("#current_file_number").text(images_list.getPosition(true) + "/" + images_list.length());
-	$("#current_file_size").text('-');
 
 	var next_image = images_list.getNext();
-	if (next_image != null) {
+	if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {
 		image_preload.attr("src", next_image);
 	}
 	drawKeymap();

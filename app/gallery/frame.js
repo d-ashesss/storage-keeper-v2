@@ -29,7 +29,10 @@ Frame.prototype = {
 	},
 
 	setFile: function(file) {
-		this.frame.src = file;
+		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "nw:blank";
+		if (this.frame.src != file_url) {
+			this.frame.src = file_url;
+		}
 	},
 
 	setSize: function(width, height) {
@@ -40,14 +43,12 @@ Frame.prototype = {
 	},
 
 	show: function(file) {
-		if (file) {
-			this.setFile(file);
-		}
+		this.setFile(file);
 		this.$frame.show();
 	},
 
 	hide: function() {
-		this.setFile("");
+		this.setFile(null);
 		this.$frame.hide();
 	}
 };
