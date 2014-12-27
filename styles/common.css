@@ -4,6 +4,7 @@ body {
 	color: rgba(0, 0, 0, 0.87);
 	overflow: hidden;
 	background-color: #CFD8DC;
+	cursor: default;
 }
 
 form {

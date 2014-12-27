@@ -70,7 +70,23 @@ $(function() {
 		window.location = "index.html";
 		return;
 	}
-	$("#new_tag_panel").hide();
+
+	$("#keymap").on("click", ".tag .key", function() {
+		var key_index = $(this).data("key_index");
+		var current_image_index = images_list.getPosition();
+		var current_tag_index = sorted_images[current_image_index];
+		if (current_tag_index != key_index) {
+			if (typeof current_tag_index != "undefined") {
+				tag_counts[current_tag_index]--;
+			}
+			tag_counts[key_index]++;
+			sorted_images[current_image_index] = key_index;
+		} else {
+			tag_counts[key_index]--;
+			delete sorted_images[current_image_index];
+		}
+		drawKeymap();
+	});
 
 	$(window)
 		.bind("mousewheel", function(/** @type {jQuery.Event} */ event) {
@@ -242,9 +258,14 @@ function drawKeymap() {
 			selected_count += tag_counts[key_index];
 			count = " (" + tag_counts[key_index] + ")";
 		}
-		var text = /*String.fromCharCode(key_code) + ": " + */tags_list[key_index] + count;
-		var $tag = $("<div>", { class: "tag" }).text(text).appendTo($keymap);
-		$("<span>", { class: "key" }).text(String.fromCharCode(key_code)).prependTo($tag);
+		var text = tags_list[key_index] + count;
+		var $tag = $("<div>", { class: "tag" })
+			.text(text)
+			.appendTo($keymap);
+		$("<span>", { class: "key" })
+			.text(String.fromCharCode(key_code))
+			.data("key_index", key_index)
+			.prependTo($tag);
 
 		var image_index = images_list.getPosition();
 		if (sorted_images[image_index] == key_index) {

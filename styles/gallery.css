@@ -58,6 +58,11 @@
 	margin-right: 5px;
 }
 
+#keymap .tag .key:hover {
+	cursor: pointer;
+	opacity: .9;
+}
+
 #current_file_stats > span {
 	margin-right: 10px;
 }
