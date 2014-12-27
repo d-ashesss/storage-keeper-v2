@@ -4,7 +4,7 @@
 	"version": "2.0.0",
 	"single-instance": false,
 	"window": {
-		"toolbars": false,
+		"toolbar": false,
 		"width": 800,
 		"height": 600,
 		"min_width": 800,
