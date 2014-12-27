@@ -30,6 +30,8 @@ Image.prototype = {
 	width: 0,
 	height: 0,
 
+	allowFlip: false,
+
 	options: {
 		/** @type {function} */
 		onSizeCallback: null
@@ -41,6 +43,11 @@ Image.prototype = {
 			this.$image.css("margin-top", margin / 2);
 		} else {
 			this.$image.css("margin-top", 0);
+		}
+		if (this.allowFlip && Math.round(Math.random()) == 1) {
+			this.$image.css("-webkit-transform", "scaleX(-1)")
+		} else {
+			this.$image.css("-webkit-transform", "scaleX(1)")
 		}
 		if (this.$image.is(":visible") && typeof this.options.onSizeCallback == "function") {
 			this.options.onSizeCallback.call(this,
@@ -70,13 +77,9 @@ Image.prototype = {
 	},
 
 	show: function(file, allow_flip) {
+		this.allowFlip = allow_flip;
 		this.setFile(file);
 		this.$image.show();
-		if (allow_flip && Math.round(Math.random()) == 1) {
-			this.$image.css("-webkit-transform", "scaleX(-1)")
-		} else {
-			this.$image.css("-webkit-transform", "scaleX(1)")
-		}
 	},
 
 	hide: function() {
