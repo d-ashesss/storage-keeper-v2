@@ -1,6 +1,6 @@
 var WINDOW_MAXIMIZE = "maximize";
-var RECENT_DIRS_LIST = "recentDirs-dev";
-var PINNED_DIRS_LIST = "pinnedDirs-dev";
+var RECENT_DIRS_LIST = "recentDirs";
+var PINNED_DIRS_LIST = "pinnedDirs";
 var OPEN_DIR = "open-dir";
 
 var _ = require("underscore");
@@ -17,10 +17,10 @@ $(function() {
 		maxSize: 15,
 		unique: true
 	});
-	$recent_dirs_list = $("#recent_dirs").find(".list").hide();
+	$recent_dirs_list = $("#recent_dirs").find(".list");
 
 	pinned_dirs_list = list.get_from_storage(localStorage, PINNED_DIRS_LIST);
-	$pinned_dirs_list = $("#pinned_dirs").find(".list").hide();
+	$pinned_dirs_list = $("#pinned_dirs").find(".list");
 
 	init_window();
 	load_history();
@@ -85,14 +85,12 @@ function load_history() {
 			.prepend( $("<span>", { class: "action-icon pin" }) )
 			.appendTo($recent_dirs_list);
 	});
-	$recent_dirs_list.slideDown("fast");
 
 	$pinned_dirs_list.empty();
 	_.each(load_dirs(pinned_dirs_list), function($dir) {
 		$dir.prepend( $("<span>", { class: "action-icon remove" }) )
 			.appendTo($pinned_dirs_list);
 	});
-	$pinned_dirs_list.slideDown("fast");
 }
 
 /**
