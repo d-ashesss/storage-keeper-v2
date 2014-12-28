@@ -1,114 +1,98 @@
-var WINDOW_MAXIMIZE = "maximize";
-var RECENT_DIRS_LIST = "recentDirs";
-var PINNED_DIRS_LIST = "pinnedDirs";
-var OPEN_DIR = "open-dir";
+(function(window, $) {
+	var _ = require("underscore");
 
-var _ = require("underscore");
+	var app = require("./app/app")(window);
+	var list = require("./app/list");
 
-var list = require("./app/list");
+	var recent_dirs_list;
+	var $recent_dirs_list;
+	var pinned_dirs_list;
+	var $pinned_dirs_list;
 
-var recent_dirs_list;
-var pinned_dirs_list;
-var $recent_dirs_list, $pinned_dirs_list;
+	$(function() {
+		app.initWindow();
+		init_lists();
+		init_dir_selection();
 
-$(function() {
-	recent_dirs_list = list.get_from_storage(localStorage, RECENT_DIRS_LIST, {
-		addToHead: true,
-		maxSize: 15,
-		unique: true
-	});
-	$recent_dirs_list = $("#recent_dirs").find(".list");
-
-	pinned_dirs_list = list.get_from_storage(localStorage, PINNED_DIRS_LIST);
-	$pinned_dirs_list = $("#pinned_dirs").find(".list");
-
-	init_window();
-	load_history();
-
-	$recent_dirs_list.on("click", ".pin", function() {
-		var path = $(this).siblings(".recent-dir").text();
-		recent_dirs_list.move(path, pinned_dirs_list);
-		load_history();
-	});
-	$recent_dirs_list.on("click", ".remove", function() {
-		var path = $(this).siblings(".recent-dir").text();
-		recent_dirs_list.remove(path);
-		load_history();
-	});
-	$pinned_dirs_list.on("click", ".remove", function() {
-		var path = $(this).siblings(".recent-dir").text();
-		pinned_dirs_list.move(path, recent_dirs_list);
-		load_history();
+		show_dirs();
 	});
 
-	$recent_dirs_list.on("click", ".action-link", function() {
-		var path = $(this).text();
-		open_dir(path);
-	});
-	$pinned_dirs_list.on("click", ".action-link", function() {
-		var path = $(this).text();
-		open_dir(path);
-	});
+	function init_lists() {
+		recent_dirs_list = list.get_from_storage(localStorage, app.RECENT_DIRS_LIST, {
+			addToHead: true,
+			maxSize: 15,
+			unique: true
+		});
+		$recent_dirs_list = $("#recent_dirs").find(".list");
 
-	$("#select_dir_btn").click(function() {
-		$("#selected_dir").click();
-	});
-	$("#selected_dir").change(function() {
-		if (this.value.length > 0) {
-			open_dir(this.value);
-		}
-	});
-});
+		pinned_dirs_list = list.get_from_storage(localStorage, app.PINNED_DIRS_LIST);
+		$pinned_dirs_list = $("#pinned_dirs").find(".list");
 
-function init_window() {
-	var gui = require("nw.gui");
+		$recent_dirs_list.on("click", ".pin", function() {
+			var dir = $(this).parents(".row").data("dir");
+			recent_dirs_list.move(dir, pinned_dirs_list);
+			show_dirs();
+		});
+		$recent_dirs_list.on("click", ".remove", function() {
+			var dir = $(this).parents(".row").data("dir");
+			recent_dirs_list.remove(dir);
+			show_dirs();
+		});
+		$pinned_dirs_list.on("click", ".remove", function() {
+			var dir = $(this).parents(".row").data("dir");
+			pinned_dirs_list.move(dir, recent_dirs_list);
+			show_dirs();
+		});
+
+		$recent_dirs_list.add($pinned_dirs_list)
+			.on("click", ".action-link", function() {
+				open_dir($(this).parents(".row").data("dir"));
+			});
+	}
+
+	function init_dir_selection() {
+		$("#select_dir_btn").click(function() {
+			$("#selected_dir").click();
+		});
+		$("#selected_dir").change(function() {
+			if (this.value.length > 0) {
+				open_dir(this.value);
+			}
+		});
+	}
+
+	function show_dirs() {
+		$recent_dirs_list.empty()
+			.append(render_list(recent_dirs_list, ["pin", "remove"]));
+		$pinned_dirs_list.empty()
+			.append(render_list(pinned_dirs_list, ["remove"]));
+	}
+
 	/**
-	 * @type {{Window: {maximize: function}}}
+	 * @param {List} list
+	 * @param {Array.<string>} icons
+	 * @returns {Array.<jQuery>}
 	 */
-	var wnd = gui.Window.get();
-
-	if (localStorage.getItem(WINDOW_MAXIMIZE)) {
-		wnd.maximize();
+	function render_list(list, icons) {
+		var dirs = list.toArray();
+		return _.map(dirs, function(dir) {
+			var $row = $("<div>", { class: "row" })
+				.data("dir", dir);
+			$("<span>", { class: "action-link recent-dir" })
+				.text(dir)
+				.appendTo($row);
+			_.each(icons, function(icon) {
+				$("<span>", { class: "action-icon" }).addClass(icon).prependTo($row);
+			});
+			return $row;
+		});
 	}
-	wnd.on("maximize", function() {
-		localStorage.setItem(WINDOW_MAXIMIZE, true);
-	});
-	wnd.on("unmaximize", function() {
-		localStorage.removeItem(WINDOW_MAXIMIZE);
-	});
-}
 
-function load_history() {
-	$recent_dirs_list.empty();
-	_.each(load_dirs(recent_dirs_list), function($dir) {
-		$dir.prepend( $("<span>", { class: "action-icon remove" }) )
-			.prepend( $("<span>", { class: "action-icon pin" }) )
-			.appendTo($recent_dirs_list);
-	});
-
-	$pinned_dirs_list.empty();
-	_.each(load_dirs(pinned_dirs_list), function($dir) {
-		$dir.prepend( $("<span>", { class: "action-icon remove" }) )
-			.appendTo($pinned_dirs_list);
-	});
-}
-
-/**
- * @param {List} list
- * @returns {Array}
- */
-function load_dirs(list) {
-	var dirs = list.toArray();
-	return _.map(dirs, function(dir) {
-		var $text = $("<span>", { class: "action-link recent-dir" }).text(dir);
-		return $("<div>", { class: "row" }).append($text);
-	});
-}
-
-function open_dir(path) {
-	if (!pinned_dirs_list.contains(path)) {
-		recent_dirs_list.add(path);
+	function open_dir(dir) {
+		if (!pinned_dirs_list.contains(dir)) {
+			recent_dirs_list.add(dir);
+		}
+		sessionStorage.setItem(app.OPEN_DIR, dir);
+		window.location = "gallery.html";
 	}
-	sessionStorage.setItem(OPEN_DIR, path);
-	window.location = "gallery.html";
-}
+})(window, window.jQuery);
