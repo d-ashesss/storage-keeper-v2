@@ -5,7 +5,7 @@
 	var _ = require("underscore");
 
 	var app = require("./app/app")(window);
-	var list = require("./app/list");
+	var List = require("./app/List");
 
 	var recent_dirs_list;
 	var $recent_dirs_list;
@@ -21,14 +21,14 @@
 	});
 
 	function init_lists() {
-		recent_dirs_list = list.get_from_storage(localStorage, RECENT_DIRS_LIST, {
+		recent_dirs_list = List.from_storage(localStorage, RECENT_DIRS_LIST, {
 			addToHead: true,
 			maxSize: 15,
 			unique: true
 		});
 		$recent_dirs_list = $("#recent_dirs").find(".list");
 
-		pinned_dirs_list = list.get_from_storage(localStorage, PINNED_DIRS_LIST);
+		pinned_dirs_list = List.from_storage(localStorage, PINNED_DIRS_LIST);
 		$pinned_dirs_list = $("#pinned_dirs").find(".list");
 
 		$recent_dirs_list.on("click", ".pin", function() {

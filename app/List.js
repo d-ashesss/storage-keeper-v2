@@ -1,29 +1,12 @@
 var _ = require("underscore");
 
 /**
- * @param {Storage} storage
- * @param {string} name
- * @param {object=} options
- * @returns {List}
- */
-exports.get_from_storage = function(storage, name, options) {
-	var list = new List(name, options);
-	var list_data = storage.getItem(name);
-	list.setData(list_data);
-	list.setStorage(storage);
-	return list;
-};
-
-/**
  * @param {string=} name
  * @param {object=} options
  * @returns {List}
  * @constructor
  */
 function List(name, options) {
-	if (!(this instanceof List)) {
-		return new List(name, options);
-	}
 	this.name = name;
 	this.list = [];
 
@@ -32,7 +15,21 @@ function List(name, options) {
 	}
 	this.options = _.extend({}, this.options, options);
 }
-exports.List = List;
+module.exports = List;
+
+/**
+ * @param {Storage} storage
+ * @param {string} name
+ * @param {object=} options
+ * @returns {List}
+ */
+List.from_storage = function(storage, name, options) {
+	var list = new List(name, options);
+	var list_data = storage.getItem(name);
+	list.setData(list_data);
+	list.setStorage(storage);
+	return list;
+};
 
 List.prototype = {
 	/** @type {string} */

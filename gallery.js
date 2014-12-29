@@ -5,7 +5,7 @@
 
 	var app = require("./app/app")(window);
 	var gallery = require("./app/gallery");
-	var list = require("./app/list");
+	var List = require("./app/List");
 	var _ = require("underscore");
 
 	var Image = require("./app/gallery/Image");
@@ -199,7 +199,7 @@
 			images_list.setData(dir.images);
 
 			var history_name = GALLERY_HISTORY + "-" + dir.path;
-			view_history = list.get_from_storage(localStorage, history_name, {
+			view_history = List.from_storage(localStorage, history_name, {
 				maxSize: Math.round(images_list.length() / 2),
 				unique: true
 			});
@@ -219,7 +219,7 @@
 		$("#current_file_number").text("");
 		$("#current_file_size").text("");
 
-		images_list = list.List();
+		images_list = new List();
 		tags_list = [];
 		sorted_images = [];
 		tag_counts = _.map(tag_keys, function() {return 0});
