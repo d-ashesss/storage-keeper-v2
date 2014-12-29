@@ -2,7 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var _ = require("underscore");
 
-var Directory = require("./gallery/directory");
+var Directory = require("./gallery/Directory");
 
 exports.readdir = function(callback) {
 	var current_dir = process.cwd();
