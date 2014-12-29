@@ -8,9 +8,9 @@
 	var list = require("./app/list");
 	var _ = require("underscore");
 
-	var Image = require("./app/gallery/image");
-	var Frame = require("./app/gallery/frame");
-	var Video = require("./app/gallery/video");
+	var Image = require("./app/gallery/Image");
+	var Frame = require("./app/gallery/Frame");
+	var Video = require("./app/gallery/Video");
 
 	/** @type {List} */
 	var images_list;
