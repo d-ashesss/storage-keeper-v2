@@ -9,11 +9,8 @@ var supported_extensions = [".jpg", ".jpeg", ".png", ".gif", ".apng", ".agif", "
  * @constructor
  */
 function Directory(path) {
-	this.path = path;
-	this.images = [];
-	this.dirs = [];
-	this.tags = [];
-	this.other = [];
+	this.path = path.replace(/\\/g, "/");
+	this.reset();
 }
 module.exports = Directory;
 
@@ -28,12 +25,24 @@ Directory.prototype = {
 	/** @type {Array.<string>} */
 	other: null,
 
+	reset: function() {
+		this.images = [];
+		this.dirs = [];
+		this.tags = [];
+		this.other = [];
+	},
+
 	/**
-	 * @param {Array.<string>} files
+	 *
+	 * @param {function} callback
 	 */
-	setContent: function(files) {
-		_.each(files, this.filterFile, this);
-		this.readTags();
+	read: function(callback) {
+		this.reset();
+		fs.readdir(this.path, (function(err, files) {
+			_.each(files, this.filterFile, this);
+			this.readTags();
+			callback(this);
+		}).bind(this));
 	},
 
 	/**
@@ -59,6 +68,18 @@ Directory.prototype = {
 			if (this.tags.indexOf(tag) < 0 && /^[a-z0-9\-]+$/i.test(tag)) {
 				this.tags.push(tag);
 			}
+		}, this);
+	},
+
+	save: function(files) {
+		_.each(files, function(dir_name, file_name) {
+			var dir_path = this.path + "/" + dir_name;
+			var file_path = this.path + "/" + file_name;
+			var dst_file_path = dir_path + "/" + path.basename(file_name);
+			if (!fs.existsSync(dir_path)) {
+				fs.mkdirSync(dir_path);
+			}
+			fs.renameSync(file_path, dst_file_path);
 		}, this);
 	}
 };

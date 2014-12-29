@@ -2,15 +2,17 @@
 	const GALLERY_HISTORY = "gallery-history";
 
 	var path = require("path");
-
-	var app = require("./app/app")(window);
-	var gallery = require("./app/gallery");
-	var List = require("./app/List");
 	var _ = require("underscore");
 
+	var app = require("./app/app")(window);
+	var List = require("./app/List");
+	var Directory = require("./app/gallery/Directory");
 	var Image = require("./app/gallery/Image");
 	var Frame = require("./app/gallery/Frame");
 	var Video = require("./app/gallery/Video");
+
+	/** @type {Directory} */
+	var current_dir;
 
 	/** @type {List} */
 	var images_list;
@@ -118,7 +120,7 @@
 					} else if (event.ctrlKey) {
 						mode = BUILD.ALL;
 					}
-					gallery.save(build(mode));
+					current_dir.save(build(mode));
 					loadImages();
 				} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 					return;
@@ -177,6 +179,7 @@
 			})
 			.resize(resize).triggerHandler("resize");
 
+		current_dir = new Directory(process.cwd());
 		loadImages();
 	});
 
@@ -195,7 +198,7 @@
 
 	function loadImages() {
 		reset();
-		gallery.readdir(function(/** @type {Directory} */ dir) {
+		current_dir.read(function(/** @type {Directory} */ dir) {
 			images_list.setData(dir.images);
 
 			var history_name = GALLERY_HISTORY + "-" + dir.path;
@@ -320,7 +323,7 @@
 			view_history.add(current_image);
 		}
 
-		var image_url = "file:///" + process.cwd().replace(/\\/g, "/") + "/" + current_image;
+		var image_url = "file:///" + current_dir.path + "/" + current_image;
 		if (/\.(webm|mp4)$/i.test(image_url)) {
 			video.show(image_url);
 			image.hide();
@@ -341,7 +344,7 @@
 
 		var next_image = images_list.getNext();
 		if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {
-			next_image = "file:///" + process.cwd().replace(/\\/g, "/") + "/" + next_image;
+			next_image = "file:///" + current_dir.path + "/" + next_image;
 			image_preload.attr("src", next_image);
 		}
 		drawKeymap();
