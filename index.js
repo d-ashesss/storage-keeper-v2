@@ -1,4 +1,7 @@
 (function(window, $) {
+	const RECENT_DIRS_LIST = "recent-dirs";
+	const PINNED_DIRS_LIST = "pinned-dirs";
+
 	var _ = require("underscore");
 
 	var app = require("./app/app")(window);
@@ -18,14 +21,14 @@
 	});
 
 	function init_lists() {
-		recent_dirs_list = list.get_from_storage(localStorage, app.RECENT_DIRS_LIST, {
+		recent_dirs_list = list.get_from_storage(localStorage, RECENT_DIRS_LIST, {
 			addToHead: true,
 			maxSize: 15,
 			unique: true
 		});
 		$recent_dirs_list = $("#recent_dirs").find(".list");
 
-		pinned_dirs_list = list.get_from_storage(localStorage, app.PINNED_DIRS_LIST);
+		pinned_dirs_list = list.get_from_storage(localStorage, PINNED_DIRS_LIST);
 		$pinned_dirs_list = $("#pinned_dirs").find(".list");
 
 		$recent_dirs_list.on("click", ".pin", function() {
@@ -92,7 +95,7 @@
 		if (!pinned_dirs_list.contains(dir)) {
 			recent_dirs_list.add(dir);
 		}
-		sessionStorage.setItem(app.OPEN_DIR, dir);
+		app.chdir(dir);
 		window.location = "gallery.html";
 	}
 })(window, window.jQuery);

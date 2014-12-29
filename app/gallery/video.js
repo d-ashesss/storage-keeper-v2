@@ -66,7 +66,7 @@ Video.prototype = {
 	},
 
 	setFile: function(file) {
-		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "nw:blank";
+		var file_url = file ? file : "nw:blank";
 		if (this.video.src != file_url) {
 			this.video.src = file_url;
 		}

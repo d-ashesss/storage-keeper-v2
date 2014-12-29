@@ -1,14 +1,15 @@
 {
 	"name": "storage-keeper",
 	"main": "index.html",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"single-instance": false,
 	"window": {
 		"toolbar": false,
 		"width": 800,
 		"height": 600,
 		"min_width": 800,
-		"min_height": 600
+		"min_height": 600,
+		"show": false
 	},
 	"webkit": {
 		"plugin": true

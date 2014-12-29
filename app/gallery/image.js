@@ -58,7 +58,7 @@ Image.prototype = {
 	},
 
 	setFile: function(file) {
-		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "img/blank.png";
+		var file_url = file ? file : "img/blank.png";
 		if (this.image.src != file_url) {
 			this.image.src = file_url;
 		} else {

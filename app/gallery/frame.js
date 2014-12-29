@@ -29,7 +29,7 @@ Frame.prototype = {
 	},
 
 	setFile: function(file) {
-		var file_url = file ? "file:///" + file.replace(/\\/g, "/") : "nw:blank";
+		var file_url = file ? file : "nw:blank";
 		if (this.frame.src != file_url) {
 			this.frame.src = file_url;
 		}
