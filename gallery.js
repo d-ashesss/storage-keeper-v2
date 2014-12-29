@@ -12,8 +12,6 @@
 	var Frame = require("./app/gallery/frame");
 	var Video = require("./app/gallery/video");
 
-	var current_dir = process.cwd();
-
 	/** @type {List} */
 	var images_list;
 	/** @type {List} */
@@ -197,24 +195,25 @@
 
 	function loadImages() {
 		reset();
-		gallery.getImages(function(images) {
-			images_list.setData(images);
+		gallery.readdir(function(/** @type {Directory} */ dir) {
+			images_list.setData(dir.images);
 
-			var history_name = GALLERY_HISTORY + "-" + current_dir;
+			var history_name = GALLERY_HISTORY + "-" + dir.path;
 			view_history = list.get_from_storage(localStorage, history_name, {
 				maxSize: Math.round(images_list.length() / 2),
 				unique: true
 			});
 
-			loadTags();
+			tags_list = dir.tags;
+			drawKeymap();
 			show();
 		});
 	}
 
 	function reset() {
-		image.setFile(null);
-		frame.setFile(null);
-		video.setFile(null);
+		image.hide();
+		frame.hide();
+		video.hide();
 
 		$("#current_file_name").text("No image loaded");
 		$("#current_file_number").text("");
@@ -224,13 +223,6 @@
 		tags_list = [];
 		sorted_images = [];
 		tag_counts = _.map(tag_keys, function() {return 0});
-	}
-
-	function loadTags() {
-		gallery.getTags(function(tags) {
-			tags_list = tags;
-			drawKeymap();
-		});
 	}
 
 	function drawKeymap() {
@@ -349,6 +341,7 @@
 
 		var next_image = images_list.getNext();
 		if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {
+			next_image = "file:///" + process.cwd().replace(/\\/g, "/") + "/" + next_image;
 			image_preload.attr("src", next_image);
 		}
 		drawKeymap();

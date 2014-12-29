@@ -38,17 +38,21 @@ Image.prototype = {
 	},
 
 	onload: function() {
-		var margin = this.height - this.image.height;
-		if (margin > 0) {
-			this.$image.css("margin-top", margin / 2);
-		} else {
-			this.$image.css("margin-top", 0);
-		}
+		var vertical_margin = (this.height - this.image.height) / 2;
+		vertical_margin = vertical_margin > 0 ? vertical_margin : 0;
+		var horizontal_margin = (this.width - this.image.width) / 2;
+		horizontal_margin = horizontal_margin > 0 ? horizontal_margin : 0;
+		this.$image.css({
+			"margin-top": vertical_margin,
+			"margin-left": horizontal_margin
+		});
+
 		if (this.allowFlip && Math.round(Math.random()) == 1) {
 			this.$image.css("-webkit-transform", "scaleX(-1)")
 		} else {
 			this.$image.css("-webkit-transform", "scaleX(1)")
 		}
+
 		if (this.$image.is(":visible") && typeof this.options.onSizeCallback == "function") {
 			this.options.onSizeCallback.call(this,
 				this.image.naturalWidth, this.image.naturalHeight,
@@ -83,6 +87,7 @@ Image.prototype = {
 	},
 
 	hide: function() {
+		this.setFile(null);
 		this.$image.hide();
 	}
 };

@@ -43,20 +43,19 @@ Video.prototype = {
 	},
 
 	onload: function() {
-		var margin = this.height - this.video.videoHeight;
-		if (margin > 0) {
-			this.$video.css({
-				width: this.video.videoWidth,
-				height: this.video.videoHeight,
-				"margin-top": margin / 2
-			});
-		} else {
-			this.$video.css({
-				width: this.width,
-				height: this.height,
-				"margin-top": 0
-			});
-		}
+		var video_width = Math.min(this.video.videoWidth, this.width);
+		var video_height = Math.min(this.video.videoHeight, this.height);
+		var vertical_margin = (this.height - video_height) / 2;
+		vertical_margin = vertical_margin > 0 ? vertical_margin : 0;
+		var horizontal_margin = (this.width - video_width) / 2;
+		horizontal_margin = horizontal_margin > 0 ? horizontal_margin : 0;
+		this.$video.css({
+			"width": video_width,
+			"height": video_height,
+			"margin-top": vertical_margin,
+			"margin-left": horizontal_margin
+		});
+
 		if (this.$video.is(":visible") && typeof this.options.onSizeCallback == "function") {
 			this.options.onSizeCallback.call(this,
 				this.video.videoWidth, this.video.videoHeight,

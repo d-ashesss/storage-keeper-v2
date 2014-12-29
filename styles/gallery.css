@@ -72,13 +72,13 @@
 }
 
 .media {
-	margin: 0 auto;
 	border: none;
 	display: block;
 }
 
 #current_image {
 	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
+	/*noinspection CssInvalidPropertyValue*/
 	filter: FlipH;
 }
 
