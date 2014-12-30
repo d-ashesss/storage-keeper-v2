@@ -33,7 +33,6 @@ Directory.prototype = {
 	},
 
 	/**
-	 *
 	 * @param {function} callback
 	 */
 	read: function(callback) {

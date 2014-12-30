@@ -91,6 +91,9 @@
 		});
 	}
 
+	/**
+	 * @param {string} dir
+	 */
 	function open_dir(dir) {
 		if (!pinned_dirs_list.contains(dir)) {
 			recent_dirs_list.add(dir);

@@ -11,7 +11,7 @@ function List(name, options) {
 	this.list = [];
 
 	if (typeof options != "object") {
-		options = {}
+		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
 }
@@ -52,6 +52,9 @@ List.prototype = {
 		this.storage = storage;
 	},
 
+	/**
+	 * @param {(Array|string)} data
+	 */
 	setData: function(data) {
 		if (typeof data == "string") {
 			data = JSON.parse(data);
@@ -72,6 +75,7 @@ List.prototype = {
 	},
 
 	/**
+	 * @param {*} value
 	 * @returns {number}
 	 */
 	indexOf: function(value) {
@@ -85,6 +89,9 @@ List.prototype = {
 		return this.indexOf(value) >= 0;
 	},
 
+	/**
+	 * @param {*} value
+	 */
 	unshift: function(value) {
 		if (this.options.unique) {
 			this.remove(value);
@@ -96,12 +103,18 @@ List.prototype = {
 		this.save();
 	},
 
+	/**
+	 * @returns {*}
+	 */
 	shift: function() {
 		var value = this.list.shift();
 		this.save();
 		return value;
 	},
 
+	/**
+	 * @param {*} value
+	 */
 	push: function(value) {
 		if (this.options.unique) {
 			this.remove(value);
@@ -113,12 +126,18 @@ List.prototype = {
 		this.save();
 	},
 
+	/**
+	 * @returns {*}
+	 */
 	pop: function() {
 		var value = this.list.pop();
 		this.save();
 		return value;
 	},
 
+	/**
+	 * @param {*} value
+	 */
 	add: function(value) {
 		if (this.options.addToHead) {
 			this.unshift(value);
@@ -128,6 +147,9 @@ List.prototype = {
 		this.position = this.indexOf(value);
 	},
 
+	/**
+	 * @param {*} value
+	 */
 	remove: function(value) {
 		var pos = this.indexOf(value);
 		if (pos >= 0) {
@@ -137,7 +159,7 @@ List.prototype = {
 	},
 
 	/**
-	 * @param value
+	 * @param {*} value
 	 * @param {List} to_list
 	 */
 	move: function(value, to_list) {
@@ -145,17 +167,26 @@ List.prototype = {
 		to_list.add(value);
 	},
 
+	/**
+	 * @returns {number}
+	 */
 	length: function() {
 		return this.list.length;
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	current: function() {
 		if (this.position < 0) {
 			return null;
 		}
-		return this.list[this.position];
+		return this.at(this.position);
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	first: function() {
 		if (this.length() > 0) {
 			this.position = 0;
@@ -163,6 +194,9 @@ List.prototype = {
 		return this.current();
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	last: function() {
 		if (this.length() > 0) {
 			this.position = this.length() - 1;
@@ -170,6 +204,9 @@ List.prototype = {
 		return this.current();
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	prev: function() {
 		if (this.position > 0) {
 			this.position--;
@@ -177,6 +214,9 @@ List.prototype = {
 		return this.current();
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	next: function() {
 		if (this.position < (this.length() - 1)) {
 			this.position++;
@@ -184,6 +224,9 @@ List.prototype = {
 		return this.current();
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	getNext: function() {
 		if (this.length() > 0 && this.position < (this.length() - 1)) {
 			return this.list[this.position + 1];
@@ -191,6 +234,9 @@ List.prototype = {
 		return null;
 	},
 
+	/**
+	 * @returns {?*}
+	 */
 	random: function() {
 		if (this.length() > 0) {
 			this.position = Math.floor(Math.random() * this.length());
@@ -198,10 +244,18 @@ List.prototype = {
 		return this.current();
 	},
 
+	/**
+	 * @param {number} position
+	 * @returns {*}
+	 */
 	at: function(position) {
 		return this.list[position];
 	},
 
+	/**
+	 * @param {boolean=} zero_base
+	 * @returns {number}
+	 */
 	getPosition: function(zero_base) {
 		return this.position + (zero_base ? 1 : 0);
 	},

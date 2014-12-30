@@ -10,14 +10,14 @@ function Image($image, options) {
 	this.image = $image.get(0);
 
 	if (typeof options != "object") {
-		options = {}
+		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
 
 	var i = this;
 	this.$image.load(function() {
 		i.onload();
-	})
+	});
 }
 module.exports = Image;
 
@@ -48,9 +48,9 @@ Image.prototype = {
 		});
 
 		if (this.allowFlip && Math.round(Math.random()) == 1) {
-			this.$image.css("-webkit-transform", "scaleX(-1)")
+			this.$image.css("-webkit-transform", "scaleX(-1)");
 		} else {
-			this.$image.css("-webkit-transform", "scaleX(1)")
+			this.$image.css("-webkit-transform", "scaleX(1)");
 		}
 
 		if (this.$image.is(":visible") && typeof this.options.onSizeCallback == "function") {
@@ -61,6 +61,9 @@ Image.prototype = {
 		}
 	},
 
+	/**
+	 * @param {string} file
+	 */
 	setFile: function(file) {
 		var file_url = file ? file : "img/blank.png";
 		if (this.image.src != file_url) {
@@ -72,6 +75,10 @@ Image.prototype = {
 		}
 	},
 
+	/**
+	 * @param {number} width
+	 * @param {number} height
+	 */
 	setSize: function(width, height) {
 		this.$image.css({
 			maxWidth: this.width = width,
@@ -80,6 +87,10 @@ Image.prototype = {
 		this.onload();
 	},
 
+	/**
+	 * @param {string} file
+	 * @param {boolean=} allow_flip
+	 */
 	show: function(file, allow_flip) {
 		this.allowFlip = allow_flip;
 		this.setFile(file);

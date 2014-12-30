@@ -165,6 +165,9 @@ App.prototype = {
 		this.nwWindow.showDevTools();
 	},
 
+	/**
+	 * @param {string} dir
+	 */
 	chdir: function(dir) {
 		process.chdir(dir);
 		this.sessionStorage[this.CURRENT_DIR] = dir;

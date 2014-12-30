@@ -10,7 +10,7 @@ function Frame($frame, options) {
 	this.frame = $frame.get(0);
 
 	if (typeof options != "object") {
-		options = {}
+		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
 }
@@ -28,6 +28,9 @@ Frame.prototype = {
 	options: {
 	},
 
+	/**
+	 * @param {string} file
+	 */
 	setFile: function(file) {
 		var file_url = file ? file : "nw:blank";
 		if (this.frame.src != file_url) {
@@ -35,6 +38,10 @@ Frame.prototype = {
 		}
 	},
 
+	/**
+	 * @param {number} width
+	 * @param {number} height
+	 */
 	setSize: function(width, height) {
 		this.$frame.css({
 			width: this.width = width,
@@ -42,6 +49,9 @@ Frame.prototype = {
 		});
 	},
 
+	/**
+	 * @param {string} file
+	 */
 	show: function(file) {
 		this.setFile(file);
 		this.$frame.show();

@@ -10,7 +10,7 @@ function Video($video, options) {
 	this.video = $video.get(0);
 
 	if (typeof options != "object") {
-		options = {}
+		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
 
@@ -64,6 +64,9 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @param {string} file
+	 */
 	setFile: function(file) {
 		var file_url = file ? file : "nw:blank";
 		if (this.video.src != file_url) {
@@ -74,6 +77,10 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @param {number} width
+	 * @param {number} height
+	 */
 	setSize: function(width, height) {
 		this.$video.css({
 			maxWidth: this.width = width,
@@ -90,6 +97,9 @@ Video.prototype = {
 		this.video.pause();
 	},
 
+	/**
+	 * @param {string} file
+	 */
 	show: function(file) {
 		this.setFile(file);
 		this.$video.show();
