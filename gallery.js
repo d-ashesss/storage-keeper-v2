@@ -1,5 +1,6 @@
 (function(window, $) {
 	const GALLERY_HISTORY = "gallery-history";
+	const DEFAULT_TAG = "_";
 
 	var path = require("path");
 	var _ = require("underscore");
@@ -7,23 +8,20 @@
 	var app = require("./app/app")(window);
 	var List = require("./app/List");
 	var Directory = require("./app/gallery/Directory");
+	var Selection = require("./app/gallery/Selection");
 	var Image = require("./app/gallery/Image");
 	var Frame = require("./app/gallery/Frame");
 	var Video = require("./app/gallery/Video");
 
 	/** @type {Directory} */
 	var current_dir;
+	/** @type {Selection} */
+	var selection;
 
 	/** @type {List} */
 	var images_list;
 	/** @type {List} */
 	var view_history;
-
-	var tag_keys = ["Q", "A", "W", "S", "E", "D", "R", "F", "Z", "X", "C", "V"];
-
-	var tags_list = [];
-	var sorted_images = [];
-	var tag_counts = [];
 
 	/** @type {Image} */
 	var image;
@@ -56,32 +54,16 @@
 		video = new Video($("#current_video"), {
 			onSizeCallback: onObjectSize
 		});
-		$("#new_tag_form").submit(function(event) {
+		$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
 			event.preventDefault();
-			var new_tag = this["tag_name"].value.replace(/[^0-9a-z\-]/ig, '');
-			if (new_tag.length > 0 && tags_list.indexOf(new_tag) < 0) {
-				tags_list.push(new_tag);
-				drawKeymap();
-			}
+			selection.addTag(this["tag_name"].value);
 			this["tag_name"].value = "";
 			this["tag_name"].blur();
 		});
 
 		$("#keymap").on("click", ".tag .key", function() {
-			var key_index = $(this).data("key_index");
-			var current_image_index = images_list.getPosition();
-			var current_tag_index = sorted_images[current_image_index];
-			if (current_tag_index != key_index) {
-				if (typeof current_tag_index != "undefined") {
-					tag_counts[current_tag_index]--;
-				}
-				tag_counts[key_index]++;
-				sorted_images[current_image_index] = key_index;
-			} else {
-				tag_counts[key_index]--;
-				delete sorted_images[current_image_index];
-			}
-			drawKeymap();
+			var tag_index = $(this).data("tag_index");
+			selection.select(images_list.current(), tag_index);
 		});
 
 		$(window)
@@ -96,81 +78,70 @@
 				if ($(event.target).is("input")) {
 					return;
 				}
-				var current_image_index = images_list.getPosition();
-				var current_tag_index = sorted_images[current_image_index];
-				var key_index = tag_keys.indexOf(String.fromCharCode(event.keyCode));
+				var key_index = Selection.getKeyIndex(event.keyCode);
+
 				if (event.shiftKey && event.keyCode == app.keys.SPACE) {
 					show(SHOW.PREV);
+
 				} else if (event.shiftKey && event.keyCode == app.keys.DELETE) {
-					if (typeof current_tag_index != "undefined") {
-						tag_counts[current_tag_index]--;
-					}
-					if (tags_list.indexOf("delete") < 0) {
-						tags_list.push("delete");
-					}
-					current_tag_index = sorted_images[current_image_index] = tags_list.indexOf("delete");
-					tag_counts[current_tag_index]++;
-					drawKeymap();
+					selection.addTag("delete");
+					selection.select(images_list.current(), "delete");
+
 				} else if (event.shiftKey && event.keyCode == app.keys.EQUAL) {
 					$("#new_tag_form").find("input").focus();
+
 				} else if (event.keyCode == app.keys.ENTER) {
-					var mode = BUILD.VIEWED;
+					var mode = BUILD.TAGGED;
 					if (event.shiftKey) {
-						mode = BUILD.TAGGED;
+						mode = BUILD.VIEWED;
 					} else if (event.ctrlKey) {
 						mode = BUILD.ALL;
 					}
-					current_dir.save(build(mode));
+					build(mode);
 					loadImages();
+
 				} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 					return;
+
 				} else if (event.keyCode == app.keys.SPACE || event.keyCode == app.keys.PGDOWN) {
 					show(SHOW.NEXT);
+
 				} else if (event.keyCode == app.keys.BACKSPACE || event.keyCode == app.keys.PGUP) {
 					show(SHOW.PREV);
+
 				} else if (event.keyCode == app.keys.HOME) {
 					show(SHOW.FIRST);
+
 				} else if (event.keyCode == app.keys.END) {
 					show(SHOW.LAST);
+
 				} else if (event.keyCode == app.keys.NUMPAD_SLASH || event.keyCode == app.keys.BACKSLASH) {
 					show(SHOW.RANDOM);
+
 				} else if (event.keyCode == app.keys.NUMPAD_ASTERISK || event.keyCode == app.keys.MINUS) {
 					show(SHOW.HISTORY_PREV);
+
 				} else if (event.keyCode == app.keys.NUMPAD_MINUS || event.keyCode == app.keys.EQUAL) {
 					show(SHOW.HISTORY_NEXT);
+
 				} else if (event.keyCode == app.keys.ESC) {
 					window.location = "index.html";
+
 				} else if (event.keyCode == app.keys.NUMPAD_PLUS) {
 					$("#new_tag_form").find("input").focus();
+
 				} else if (event.keyCode == app.keys.TILDA) {
 					$("#overlay").fadeToggle("fast");
+
 				} else if (event.keyCode == app.keys.INSERT) {
-					if (typeof current_tag_index != "undefined") {
-						tag_counts[current_tag_index]--;
-					}
-					if (typeof current_tag_index == "undefined" || current_tag_index == (tags_list.length - 1)) {
-						current_tag_index = sorted_images[current_image_index] = 0;
-					} else {
-						current_tag_index = ++sorted_images[current_image_index];
-					}
-					tag_counts[current_tag_index]++;
-					drawKeymap();
+					selection.select(images_list.current(), 0);
+
 				} else if (event.keyCode == app.keys.DELETE) {
-					tag_counts[current_tag_index]--;
-					delete sorted_images[current_image_index];
-					drawKeymap();
-				} else if (key_index >= 0 && typeof tags_list[key_index] != "undefined") {
-					if (current_tag_index != key_index) {
-						if (typeof current_tag_index != "undefined") {
-							tag_counts[current_tag_index]--;
-						}
-						tag_counts[key_index]++;
-						sorted_images[current_image_index] = key_index;
-					} else {
-						tag_counts[key_index]--;
-						delete sorted_images[current_image_index];
-					}
-					drawKeymap();
+					selection.deselect(images_list.current());
+
+				} else if (key_index >= 0) {
+					selection.toggle(images_list.current(), key_index);
+
 				} else {
 					console.info(event.keyCode, String.fromCharCode(event.keyCode));
 					return;
@@ -180,6 +151,8 @@
 			.resize(resize).triggerHandler("resize");
 
 		current_dir = new Directory(process.cwd());
+		selection = new Selection();
+		selection.on("change", drawKeymap);
 		loadImages();
 	});
 
@@ -207,8 +180,7 @@
 				unique: true
 			});
 
-			tags_list = dir.tags;
-			drawKeymap();
+			selection.setTags(dir.tags);
 			show();
 		});
 	}
@@ -223,45 +195,38 @@
 		$("#current_file_size").text("");
 
 		images_list = new List();
-		tags_list = [];
-		sorted_images = [];
-		tag_counts = _.map(tag_keys, function() {return 0});
 	}
 
 	function drawKeymap() {
 		var $keymap = $('#keymap').empty();
-
-		var selected_count = 0;
-		_.each(tag_keys, function(key, key_index) {
-			if (typeof tags_list[key_index] == "undefined") {
-				return;
+		var tags = selection.dumpTags();
+		_.each(tags, function(tag, tag_index) {
+			var text = tag.name;
+			if (tag.images.length > 0) {
+				text += " (" + tag.images.length + ")";
 			}
-			var count = "";
-			if (tag_counts[key_index] > 0) {
-				selected_count += tag_counts[key_index];
-				count = " (" + tag_counts[key_index] + ")";
-			}
-			var text = tags_list[key_index] + count;
 			var $tag = $("<div>", { class: "tag" })
 				.text(text)
-				.appendTo($keymap);
+				.appendTo(this.$keymap);
 			$("<span>", { class: "key" })
-				.text(key)
-				.data("key_index", key_index)
+				.text(tag.key)
+				.data("tag_index", tag_index)
 				.prependTo($tag);
 
-			var image_index = images_list.getPosition();
-			if (sorted_images[image_index] == key_index) {
+			if (tag.images.indexOf(this.current_image) >= 0) {
 				$tag.addClass("current");
 			}
+		}, {
+			$keymap: $keymap,
+			current_image: images_list.current()
 		});
 
+		var selected_count = _.reduce(tags, function(count, tag) {
+			return count + tag.images.length;
+		}, 0);
 		$("<div>").html("&nbsp;").appendTo($keymap);
 		$("<div>")
 			.text("selected: " + selected_count)
-			.appendTo($keymap);
-		$("<div>")
-			.text("skipped: " + (sorted_images.length - selected_count))
 			.appendTo($keymap);
 	}
 
@@ -279,6 +244,9 @@
 		HISTORY_NEXT: 7
 	};
 
+	/**
+	 * @param {SHOW=} direction
+	 */
 	function show(direction) {
 		if (images_list.length() == 0) {
 			return;
@@ -359,21 +327,22 @@
 		VIEWED: 2
 	};
 
+	/**
+	 * @param {BUILD} mode
+	 */
 	function build(mode) {
-		var count = sorted_images.length;
-		if (mode == BUILD.ALL) {
-			count = images_list.length();
-		}
-
-		var result = {};
-		for (var i = 0; i < count; i++) {
-			var image = images_list.at(i);
-			if (typeof sorted_images[i] != "undefined") {
-				result[image] = tags_list[sorted_images[i]];
-			} else if (mode == BUILD.VIEWED || mode == BUILD.ALL) {
-				result[image] = "_";
+		var images = selection.dumpImages();
+		if (mode != BUILD.TAGGED) {
+			var count = images_list.getPosition(true);
+			if (mode == BUILD.ALL) {
+				count = images_list.length();
 			}
+			_.each(images_list.toArray().slice(0, count), function(image) {
+				if (!this[image]) {
+					this[image] = DEFAULT_TAG;
+				}
+			}, images);
 		}
-		return result;
+		current_dir.save(images);
 	}
 })(window, window.jQuery);
