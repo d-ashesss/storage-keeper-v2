@@ -63,7 +63,7 @@
 
 		$("#keymap").on("click", ".tag .key", function() {
 			var tag_index = $(this).data("tag_index");
-			selection.select(images_list.current(), tag_index);
+			selection.toggle(images_list.current(), tag_index);
 		});
 
 		$(window)
