@@ -1,9 +1,12 @@
 var _ = require("underscore");
 
+var Media = require("./Media");
+
 /**
  * @param {jQuery} $frame
  * @param {object=} options
  * @constructor
+ * @extends {Media}
  */
 function Frame($frame, options) {
 	this.$frame = $frame;
@@ -16,7 +19,7 @@ function Frame($frame, options) {
 }
 module.exports = Frame;
 
-Frame.prototype = {
+Frame.prototype = Media.extend({
 	/** @type {jQuery} */
 	$frame: null,
 	/** @type {HTMLIFrameElement} */
@@ -61,4 +64,4 @@ Frame.prototype = {
 		this.setFile(null);
 		this.$frame.hide();
 	}
-};
+});

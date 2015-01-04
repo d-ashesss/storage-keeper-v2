@@ -1,13 +1,14 @@
 var _ = require("underscore");
 
+var EventEmiter = require("../EventEmiter");
 var List = require("../List");
 
 /**
  * @constructor
+ * @extends {EventEmiter}
  */
 function Selection() {
 	this.tags = [];
-	this.events = {};
 }
 module.exports = Selection;
 
@@ -152,31 +153,7 @@ Selection.prototype = {
 				return images;
 			}, images, tag);
 		}, {});
-	},
-
-	/** @type {Object.<string, Array.<function>>} */
-	events: null,
-
-	/**
-	 * @param {string} event_name
-	 * @param {function} handler
-	 */
-	on: function (event_name, handler) {
-		if (!this.events[event_name]) {
-			this.events[event_name] = [];
-		}
-		this.events[event_name].push(handler);
-	},
-
-	/**
-	 * @param {string} event_name
-	 */
-	trigger: function (event_name) {
-		if (!this.events[event_name]) {
-			return;
-		}
-		_.each(this.events[event_name], function(handler) {
-			setTimeout(handler, 10, this);
-		}, this);
 	}
 };
+
+EventEmiter.mixin(Selection.prototype);

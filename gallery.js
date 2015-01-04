@@ -47,13 +47,12 @@
 	$(function() {
 		app.initWindow();
 
-		image = new Image($("#current_image"), {
-			onSizeCallback: onObjectSize
-		});
+		image = new Image($("#current_image"));
+		image.on("load", onObjectSize);
 		frame = new Frame($("#current_frame"));
-		video = new Video($("#current_video"), {
-			onSizeCallback: onObjectSize
-		});
+		video = new Video($("#current_video"));
+		video.on("load", onObjectSize);
+
 		$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
 			event.preventDefault();
 			selection.addTag(this["tag_name"].value);
@@ -162,11 +161,11 @@
 		frame.setSize(window.innerWidth, window.innerHeight);
 	}
 
-	function onObjectSize(naturalWidth, naturalHeight, actualWidth, actualHeight) {
-		var natural = naturalWidth * naturalHeight;
-		var actual = actualWidth * actualHeight;
+	function onObjectSize(object) {
+		var natural = object.naturalWidth * object.naturalHeight;
+		var actual = object.width * object.height;
 		var scale = actual / natural * 100;
-		$("#current_file_size").text(naturalWidth + '×' + naturalHeight + ' ' + scale.toFixed(0) + '%');
+		$("#current_file_size").text(object.naturalWidth + '×' + object.naturalHeight + ' ' + scale.toFixed(0) + '%');
 	}
 
 	function loadImages() {

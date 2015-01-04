@@ -1,9 +1,12 @@
 var _ = require("underscore");
 
+var Media = require("./Media");
+
 /**
  * @param {jQuery} $image
  * @param {object=} options
  * @constructor
+ * @extends {Media}
  */
 function Image($image, options) {
 	this.$image = $image;
@@ -14,14 +17,11 @@ function Image($image, options) {
 	}
 	this.options = _.extend({}, this.options, options);
 
-	var i = this;
-	this.$image.load(function() {
-		i.onload();
-	});
+	this.$image.load(this.onload.bind(this));
 }
 module.exports = Image;
 
-Image.prototype = {
+Image.prototype = Media.extend({
 	/** @type {jQuery} */
 	$image: null,
 	/** @type {HTMLImageElement} */
@@ -33,18 +33,12 @@ Image.prototype = {
 	allowFlip: false,
 
 	options: {
-		/** @type {function} */
-		onSizeCallback: null
 	},
 
 	onload: function() {
-		var vertical_margin = (this.height - this.image.height) / 2;
-		vertical_margin = vertical_margin > 0 ? vertical_margin : 0;
-		var horizontal_margin = (this.width - this.image.width) / 2;
-		horizontal_margin = horizontal_margin > 0 ? horizontal_margin : 0;
 		this.$image.css({
-			"margin-top": vertical_margin,
-			"margin-left": horizontal_margin
+			"margin-top": this.getMargin(this.height, this.image.height),
+			"margin-left": this.getMargin(this.width, this.image.width)
 		});
 
 		if (this.allowFlip && Math.round(Math.random()) == 1) {
@@ -53,11 +47,13 @@ Image.prototype = {
 			this.$image.css("-webkit-transform", "scaleX(1)");
 		}
 
-		if (this.$image.is(":visible") && typeof this.options.onSizeCallback == "function") {
-			this.options.onSizeCallback.call(this,
-				this.image.naturalWidth, this.image.naturalHeight,
-				this.$image.width(), this.$image.height()
-			);
+		if (this.$image.is(":visible")) {
+			this.trigger("load", {
+				width: this.$image.width(),
+				height: this.$image.height(),
+				naturalWidth: this.image.naturalWidth,
+				naturalHeight: this.image.naturalHeight
+			});
 		}
 	},
 
@@ -69,9 +65,7 @@ Image.prototype = {
 		if (this.image.src != file_url) {
 			this.image.src = file_url;
 		} else {
-			setTimeout(function(i) {
-				i.onload();
-			}, 1, this);
+			this.onload();
 		}
 	},
 
@@ -101,4 +95,4 @@ Image.prototype = {
 		this.setFile(null);
 		this.$image.hide();
 	}
-};
+});
