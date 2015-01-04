@@ -31,14 +31,24 @@ Frame.prototype = Media.extend({
 	options: {
 	},
 
+	onload: function() {
+		this.trigger("load", {
+			src: this.frame.src,
+			width: this.$frame.width(),
+			height: this.$frame.height()
+		});
+	},
+
 	/**
 	 * @param {string} file
 	 */
 	setFile: function(file) {
-		var file_url = file ? file : "nw:blank";
+		this.file = file;
+		var file_url = this.getFileUrl();
 		if (this.frame.src != file_url) {
 			this.frame.src = file_url;
 		}
+		this.onload();
 	},
 
 	/**
@@ -50,6 +60,7 @@ Frame.prototype = Media.extend({
 			width: this.width = width,
 			height: this.height = height
 		});
+		this.onload();
 	},
 
 	/**
@@ -63,5 +74,9 @@ Frame.prototype = Media.extend({
 	hide: function() {
 		this.setFile(null);
 		this.$frame.hide();
+	},
+
+	isVisible: function() {
+		return this.$frame.is(":visible");
 	}
 });

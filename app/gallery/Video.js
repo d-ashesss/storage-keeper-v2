@@ -50,21 +50,20 @@ Video.prototype = Media.extend({
 			"margin-left": this.getMargin(this.width, video_width)
 		});
 
-		if (this.$video.is(":visible")) {
-			this.trigger("load", {
-				width: this.$video.width(),
-				height: this.$video.height(),
-				naturalWidth: this.video.videoWidth,
-				naturalHeight: this.video.videoHeight
-			});
-		}
+		this.trigger("load", {
+			src: this.video.src,
+			width: this.video.videoWidth,
+			height: this.video.videoHeight,
+			scale: this.getScale(this.video.videoWidth, this.video.videoHeight, this.$video.width(), this.$video.height())
+		});
 	},
 
 	/**
 	 * @param {string} file
 	 */
 	setFile: function(file) {
-		var file_url = file ? file : "nw:blank";
+		this.file = file;
+		var file_url = this.getFileUrl();
 		if (this.video.src != file_url) {
 			this.video.src = file_url;
 		}
@@ -104,5 +103,9 @@ Video.prototype = Media.extend({
 	hide: function() {
 		this.setFile(null);
 		this.$video.hide();
+	},
+
+	isVisible: function() {
+		return this.$video.is(":visible");
 	}
 });

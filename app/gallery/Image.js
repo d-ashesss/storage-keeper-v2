@@ -35,6 +35,8 @@ Image.prototype = Media.extend({
 	options: {
 	},
 
+	defaultFile: "img/blank.png",
+
 	onload: function() {
 		this.$image.css({
 			"margin-top": this.getMargin(this.height, this.image.height),
@@ -47,21 +49,20 @@ Image.prototype = Media.extend({
 			this.$image.css("-webkit-transform", "scaleX(1)");
 		}
 
-		if (this.$image.is(":visible")) {
-			this.trigger("load", {
-				width: this.$image.width(),
-				height: this.$image.height(),
-				naturalWidth: this.image.naturalWidth,
-				naturalHeight: this.image.naturalHeight
-			});
-		}
+		this.trigger("load", {
+			src: this.image.src,
+			width: this.image.naturalWidth,
+			height: this.image.naturalHeight,
+			scale: this.getScale(this.image.naturalWidth, this.image.naturalHeight, this.$image.width(), this.$image.height())
+		});
 	},
 
 	/**
 	 * @param {string} file
 	 */
 	setFile: function(file) {
-		var file_url = file ? file : "img/blank.png";
+		this.file = file;
+		var file_url = this.getFileUrl();
 		if (this.image.src != file_url) {
 			this.image.src = file_url;
 		} else {
@@ -94,5 +95,9 @@ Image.prototype = Media.extend({
 	hide: function() {
 		this.setFile(null);
 		this.$image.hide();
+	},
+
+	isVisible: function() {
+		return this.$image.is(":visible");
 	}
 });

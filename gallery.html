@@ -8,17 +8,13 @@
 <title>Storage Keeper Gallery</title>
 
 <div id=overlay class=overlay>
-	<div class=panel>
+	<div id="keymap_panel" class=panel>
 		<form id=new_tag_form>
 			<label><input name=tag_name type=text placeholder="New Tag"></label>
 		</form>
 		<div id=keymap></div>
 	</div>
-	<div id=current_file_stats class=panel>
-		<span id=current_file_name></span>
-		<span id=current_file_number></span>
-		<span id=current_file_size></span>
-	</div>
+	<div id=current_file_panel class=panel></div>
 </div>
 
 <img src="img/blank.png" id=current_image class=media>

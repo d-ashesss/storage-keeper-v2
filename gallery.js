@@ -47,12 +47,6 @@
 	$(function() {
 		app.initWindow();
 
-		image = new Image($("#current_image"));
-		image.on("load", onObjectSize);
-		frame = new Frame($("#current_frame"));
-		video = new Video($("#current_video"));
-		video.on("load", onObjectSize);
-
 		$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
 			event.preventDefault();
 			selection.addTag(this["tag_name"].value);
@@ -147,11 +141,27 @@
 				}
 				event.preventDefault();
 			})
-			.resize(resize).triggerHandler("resize");
+			.resize(resize);
 
 		current_dir = new Directory(process.cwd());
+
+		image = new Image($("#current_image"));
+		image.on("load", onObjectLoad);
+		image.setBasePath(current_dir.path);
+
+		frame = new Frame($("#current_frame"));
+		frame.on("load", onObjectLoad);
+		frame.setBasePath(current_dir.path);
+
+		video = new Video($("#current_video"));
+		video.on("load", onObjectLoad);
+		video.setBasePath(current_dir.path);
+
 		selection = new Selection();
 		selection.on("change", drawKeymap);
+
+		$(window).triggerHandler("resize");
+
 		loadImages();
 	});
 
@@ -161,11 +171,22 @@
 		frame.setSize(window.innerWidth, window.innerHeight);
 	}
 
-	function onObjectSize(object) {
-		var natural = object.naturalWidth * object.naturalHeight;
-		var actual = object.width * object.height;
-		var scale = actual / natural * 100;
-		$("#current_file_size").text(object.naturalWidth + '×' + object.naturalHeight + ' ' + scale.toFixed(0) + '%');
+	/**
+	 * @param object
+	 * @this {Media}
+	 */
+	function onObjectLoad(object) {
+		if (this.isVisible()) {
+			var size = object.width + '×' + object.height;
+			if (typeof object.scale != "undefined") {
+				size += ':' + object.scale + '%';
+			}
+
+			$("#current_file_panel").empty()
+				.append( $("<span>").text(this.getFile()) )
+				.append( $("<span>").text( images_list.getPosition(true) + "/" + images_list.length() ) )
+				.append( $("<span>").text(size) );
+		}
 	}
 
 	function loadImages() {
@@ -189,9 +210,7 @@
 		frame.hide();
 		video.hide();
 
-		$("#current_file_name").text("No image loaded");
-		$("#current_file_number").text("");
-		$("#current_file_size").text("");
+		$("#current_file_panel").text("No image loaded");
 
 		images_list = new List();
 	}
@@ -290,24 +309,19 @@
 			view_history.add(current_image);
 		}
 
-		var image_url = "file:///" + current_dir.path + "/" + current_image;
-		if (/\.(webm|mp4)$/i.test(image_url)) {
-			video.show(image_url);
+		if (/\.(webm|mp4)$/i.test(current_image)) {
+			video.show(current_image);
 			image.hide();
 			frame.hide();
-		} else if (/\.swf$/i.test(image_url)) {
-			frame.show(image_url);
+		} else if (/\.swf$/i.test(current_image)) {
+			frame.show(current_image);
 			image.hide();
 			video.hide();
-			$("#current_file_size").text('-');
 		} else {
-			image.show(image_url, direction == SHOW.RANDOM);
+			image.show(current_image, direction == SHOW.RANDOM);
 			video.hide();
 			frame.hide();
 		}
-
-		$("#current_file_name").text(current_image);
-		$("#current_file_number").text(images_list.getPosition(true) + "/" + images_list.length());
 
 		var next_image = images_list.getNext();
 		if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {

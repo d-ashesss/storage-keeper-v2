@@ -64,11 +64,11 @@
 	opacity: .9;
 }
 
-#current_file_stats > span {
+#current_file_panel > span {
 	margin-right: 10px;
 }
 
-#current_file_stats > span:last-child {
+#current_file_panel > span:last-child {
 	margin-right: 0;
 }
 
