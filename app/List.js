@@ -184,6 +184,13 @@ List.prototype = {
 		return this.at(this.position);
 	},
 
+	setCurrent: function(value) {
+		var position = this.indexOf(value);
+		if (position >= 0) {
+			this.setPosition(position);
+		}
+	},
+
 	/**
 	 * @returns {?*}
 	 */
@@ -258,6 +265,10 @@ List.prototype = {
 	 */
 	getPosition: function(zero_base) {
 		return this.position + (zero_base ? 1 : 0);
+	},
+
+	setPosition: function(position) {
+		this.position = position;
 	},
 
 	save: function() {

@@ -296,15 +296,16 @@
 
 		case SHOW.HISTORY_PREV:
 			current_image = view_history.prev();
+			images_list.setCurrent(current_image);
 			break;
 
 		case SHOW.HISTORY_NEXT:
 			current_image = view_history.next();
+			images_list.setCurrent(current_image);
 			break;
 
 		default:
 		}
-
 		if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
 			view_history.add(current_image);
 		}
