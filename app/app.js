@@ -121,10 +121,18 @@ App.prototype = {
 		}
 
 		this.nwWindow.on("maximize", (function() {
-			this.localStorage.setItem(this.WINDOW_MAXIMIZED, true);
+			try {
+				this.localStorage.setItem(this.WINDOW_MAXIMIZED, true);
+			} catch (/** Error */ error) {
+				console.warn(error.message);
+			}
 		}).bind(this));
 		this.nwWindow.on("unmaximize", (function() {
-			this.localStorage.removeItem(this.WINDOW_MAXIMIZED);
+			try {
+				this.localStorage.removeItem(this.WINDOW_MAXIMIZED);
+			} catch (/** Error */ error) {
+				console.warn(error.message);
+			}
 		}).bind(this));
 
 		window.jQuery(window).keydown((function(event) {
