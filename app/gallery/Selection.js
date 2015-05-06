@@ -1,18 +1,24 @@
+var path = require("path");
 var _ = require("underscore");
 
 var EventEmiter = require("../EventEmiter");
 var List = require("../List");
 
 /**
+ * @param {Directory} directory
  * @constructor
  * @extends {EventEmiter}
  */
-function Selection() {
-	this.tags = [];
+function Selection(directory) {
+	this.resetImages();
+	this.directory = directory;
+	this.selectedDirs = [];
+	this.selectedDirs.push(directory.getPath());
+	this.selectDest = directory.getPath();
 }
 module.exports = Selection;
 
-Selection.TAG_KEYS = ["Q", "A", "W", "S", "E", "D", "R", "F", "Z", "X", "C", "V"];
+Selection.TAG_KEYS = ["Q", "A", "W", "S", "E", "D", "R", "F", "T", "G", "Z", "X", "C", "V", "B"];
 
 /**
  * @param {number} char_code
@@ -24,135 +30,212 @@ Selection.getKeyIndex = function(char_code) {
 };
 
 Selection.prototype = {
-	/** @type {Array.<List>} */
-	tags: null,
+	/** @type {Directory} */
+	directory: null,
+	/** @type {Array.<string>} */
+	selectedDirs: null,
+	/** @type {Array.<string>} */
+	selectedImages: null,
+	/** @type {Object.<string, string>} */
+	taggedImages: null,
+	/** @type {string} */
+	selectDest: null,
 
-	/**
-	 * @param {Array.<string>} tags
-	 */
-	setTags: function(tags) {
-		this.tags = [];
-		_.each(tags, function(tag_name) {
-			this._addTag(tag_name);
-		}, this);
+	resetImages: function() {
+		this.selectedImages = [];
+		this.taggedImages = {};
+	},
+
+	setSelectDest: function(dir_path) {
+		if (typeof dir_path === "string") {
+			this.selectDest = path.resolve(dir_path).replace(/\\/g, "/") + "/";
+		} else {
+			this.selectDest = this.directory.getPath();
+		}
 		this.trigger("change");
 	},
 
+	getSelectDest: function() {
+		var display_path = path.dirname(this.selectDest);
+		var path_basename = path.basename(display_path);
+		if (path_basename.length > 0) {
+			display_path = path_basename + "/";
+		}
+		var basename = path.basename(this.selectDest);
+		if (basename.length > 0) {
+			display_path = display_path + basename;
+		}
+		return display_path;
+	},
+
+	getDirList: function(current_image) {
+		var current_tag = this.taggedImages[current_image];
+		var dir_list = this.directory.getDirList();
+		return _.map(dir_list, function(dir) {
+			var current = false;
+			if (current_tag === dir.getPath()) {
+				current = true;
+			}
+			return {
+				index: dir.getPath(),
+				name: dir.getName(),
+				level: dir.level,
+				selected: this.dirSelected(dir.getPath()),
+				current: current,
+				tagged: this.imagesTagged(dir.getPath())
+			};
+		}, this);
+	},
+
+	dirSelected: function(path) {
+		return this.selectedDirs.indexOf(path) >= 0;
+	},
+
+	selectDir: function(path) {
+		if (!this.dirSelected(path)) {
+			this.selectedDirs.push(path);
+			this.trigger("change");
+			this.trigger("dir-select");
+			this.resetImages();
+		}
+	},
+
+	selectOneDir: function(path) {
+		this.selectedDirs = [];
+		this.selectDir(path);
+	},
+
+	deselectDir: function(path) {
+		var index = this.selectedDirs.indexOf(path);
+		if (index >= 0) {
+			this.selectedDirs.splice(index, 1);
+			this.trigger("change");
+			this.trigger("dir-select");
+			this.resetImages();
+		}
+	},
+
+	toggleDir: function(path) {
+		if (this.dirSelected(path)) {
+			this.deselectDir(path);
+		} else {
+			this.selectDir(path);
+		}
+	},
+
 	/**
-	 * @param {string} raw_tag_name
+	 * @returns {Array.<string>}
 	 */
-	_addTag: function(raw_tag_name) {
-		var tag_name = raw_tag_name.replace(/[^0-9a-z\-]/ig, '');
-		if (this.getTagIndex(tag_name) >= 0) {
+	getSelectedDirs: function() {
+		return this.selectedDirs;
+	},
+
+	imageSelected: function(path) {
+		return this.selectedImages.indexOf(path) >= 0;
+	},
+
+	selectImage: function(path) {
+		if (typeof path !== "string") {
 			return;
 		}
-		this.tags.push(new List(tag_name, { unique: true }));
-	},
-	/**
-	 * @param {string} tag_name
-	 */
-	addTag: function(tag_name) {
-		this._addTag(tag_name);
-		this.trigger("change");
-	},
-
-	/**
-	 * @param {string} tag_name
-	 */
-	getTagIndex: function(tag_name) {
-		return _.reduce(this.tags, function(found_index, tag, tag_index) {
-			if (found_index < 0 && tag.name == tag_name) {
-				return tag_index;
-			}
-			return found_index;
-		}, -1);
-	},
-
-	/**
-	 * @param {string} image
-	 * @param {(string|number)} tag
-	 */
-	_select: function(image, tag) {
-		var tag_index = (typeof tag == "string") ? this.getTagIndex(tag) : tag;
-		this._deselect(image);
-		if (this.tags[tag_index]) {
-			this.tags[tag_index].add(image);
+		if (!this.imageSelected(path)) {
+			this.selectedImages.push(path);
+			this.trigger("change");
 		}
 	},
 
-	/**
-	 * @param {string} image
-	 * @param {(string|number)} tag
-	 */
-	select: function(image, tag) {
-		this._select(image, tag);
-		this.trigger("change");
+	deselectImage: function(path) {
+		if (typeof path !== "string") {
+			return;
+		}
+		var index = this.selectedImages.indexOf(path);
+		if (index >= 0) {
+			this.selectedImages.splice(index, 1);
+			this.trigger("change");
+		}
 	},
 
-	/**
-	 * @param {string} image
-	 */
-	_deselect: function(image) {
-		_.each(this.tags, function(tag) {
-			tag.remove(image);
-		});
-	},
-	/**
-	 * @param {string} image
-	 */
-	deselect: function(image) {
-		this._deselect(image);
-		this.trigger("change");
-	},
-
-	/**
-	 * @param {string} image
-	 * @param {number} tag_index
-	 */
-	toggle: function(image, tag_index) {
-		if (this.isSelected(image, tag_index)) {
-			this.deselect(image);
+	toggleImage: function(path) {
+		if (this.imageSelected(path)) {
+			this.deselectImage(path);
 		} else {
-			this.select(image, tag_index);
+			this.selectImage(path);
 		}
 	},
 
-	/**
-	 * @param {string} image
-	 * @param {number} tag_index
-	 */
-	isSelected: function(image, tag_index) {
-		var tags = this.tags[tag_index] ? [this.tags[tag_index]] : this.tags;
-		return _.reduce(tags, function(found, tag) {
-			return found || tag.indexOf(image) >= 0;
-		}, false);
+	imagesSelected: function() {
+		return this.selectedImages.length;
+	},
+
+	tagImage: function(path, tag) {
+		if (typeof path !== "string") {
+			return;
+		}
+		if (typeof this.taggedImages[path] !== "undefined") {
+			var tag_list = this.getSubTagList(tag);
+			var tag_index = tag_list.indexOf(this.taggedImages[path]);
+			if (tag_index === (tag_list.length - 1)) {
+				this.untagImage(path);
+				return;
+			}
+			if (tag_index >= 0) {
+				tag = tag_list[tag_index + 1];
+			}
+		}
+		this.taggedImages[path] = tag;
+		this.trigger("change");
+	},
+
+	untagImage: function(path) {
+		if (typeof path !== "string") {
+			return;
+		}
+		delete this.taggedImages[path];
+		this.trigger("change");
+	},
+
+	imagesTagged: function(only_tag) {
+		return _.reduce(this.taggedImages, function(memo, tag) {
+			if (typeof only_tag !== "undefined" && only_tag !== tag) {
+				return memo;
+			}
+			return memo + 1;
+		}, 0);
 	},
 
 	/**
-	 * @returns {Array.<{name, key, images: Array}>}
+	 * @returns {Array.<string>}
 	 */
-	dumpTags: function() {
-		var tags = [];
-		_.each(this.tags, function(tag, i) {
-			this.push({
-				name: tag.name,
-				key: Selection.TAG_KEYS[i],
-				images: tag.toArray()
-			});
-		}, tags);
-		return tags;
+	getSubTagList: function(tag) {
+		var tag_list = [tag];
+		var dir_list = this.directory.getDirList();
+		var tag_level = null;
+		_.find(dir_list, function(dir) {
+			if (dir.getPath() === tag) {
+				tag_level = dir.level;
+				return;
+			}
+			if (tag_level !== null && dir.level > tag_level) {
+				tag_list.push(dir.getPath());
+			}
+			if (dir.level === tag_level) {
+				return true;
+			}
+		});
+		return tag_list;
 	},
 
 	/**
-	 * @returns {Object.<string, string>}
-	 */
+	* @returns {Object.<string, string>}
+	*/
 	dumpImages: function() {
-		return _.reduce(this.tags, function(images, tag) {
-			return _.reduce(tag.toArray(), function(images, image) {
-				images[image] = this.name;
+		if (this.selectedImages.length > 0) {
+			return _.reduce(this.selectedImages, function(images, image) {
+				images[image] = this.selectDest;
 				return images;
-			}, images, tag);
-		}, {});
+			}, {}, this);
+		}
+		return this.taggedImages;
 	}
 };
 

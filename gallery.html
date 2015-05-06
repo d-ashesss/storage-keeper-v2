@@ -13,7 +13,22 @@
 			<label><input name=tag_name type=text placeholder="New Tag"></label>
 		</form>
 		<div id=keymap></div>
+		<div id="selection">
+			<div>
+				selected: <span class="selected"></span>
+			</div>
+			<div>
+				tagged: <span class="tagged"></span>
+			</div>
+			<div class="subtitle">Selection Destination</div>
+			<div class="destination"></div>
+			<div>
+				<input id=selected_dir type=file class="hidden" nwdirectory />
+				<button id=select_dir_btn class=small>Select dir</button>
+			</div>
+		</div>
 	</div>
+	<div id=selection_panel class=panel style=display:none ></div>
 	<div id=current_file_panel class=panel></div>
 </div>
 

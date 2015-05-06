@@ -66,3 +66,8 @@ button:hover {
 	background-color: #607D8B;
 	cursor: pointer;
 }
+
+button.small {
+	font-size: 0.8em;
+	padding: 3px 5px;
+}

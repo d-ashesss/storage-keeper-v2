@@ -16,6 +16,11 @@
 	vertical-align: top;
 }
 
+.overlay .panel .subtitle {
+	padding: 5px 0;
+	font-size: 1.1em;
+}
+
 .fatal_error {
 	display: block !important;
 	background-color: #FFCCBC !important;
@@ -32,24 +37,32 @@
 	box-sizing: border-box;
 }
 
-#keymap .tag {
+#keymap .node {
 	margin-bottom: 1px;
-	width: 160px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	-webkit-user-select: none;
+	cursor: pointer;
+	line-height: 21px;
 }
 
-#keymap .tag.current {
-	font-weight: bold;
+#keymap .node.level0 {
+	width: 160px;
+}
+#keymap .node.level1 {
+	padding-left: 15px;
+	width: 145px;
+}
+#keymap .node.level2 {
+	padding-left: 55px;
+	width: 105px;
 }
 
-#keymap .tag.current .key {
-	font-weight: normal;
-	background-color: #455A64;
+#keymap .node.selected {
+	background-color: #CFD8DC;
 }
 
-#keymap .tag .key {
+#keymap .node .key {
 	padding: 2px;
 	background-color: #607D8B;
 	color: #FAFAFA;
@@ -57,11 +70,25 @@
 	width: 20px;
 	text-align: center;
 	margin-right: 5px;
+	line-height: 17px;
 }
 
-#keymap .tag .key:hover {
-	cursor: pointer;
-	opacity: .9;
+#keymap .node.current {
+	font-weight: bold;
+}
+
+#keymap .node.current .key {
+	font-weight: normal;
+	background-color: #455A64;
+}
+
+#keymap.compact .node {
+	line-height: 17px;
+	margin-bottom: 0;
+}
+
+#keymap.compact .node .key {
+	padding: 0 2px;
 }
 
 #current_file_panel > span {
@@ -70,6 +97,18 @@
 
 #current_file_panel > span:last-child {
 	margin-right: 0;
+}
+
+#current_file_name.selected {
+	font-weight: bold;
+}
+
+#selection {
+	margin-top: 15px;
+}
+
+#selection_panel #selection {
+	margin-top: 0;
 }
 
 .media {

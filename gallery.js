@@ -1,5 +1,6 @@
 (function(window, $) {
 	const GALLERY_HISTORY = "gallery-history";
+	const GALLERY_SELECT_DEST = "gallery-select-dest";
 	const DEFAULT_TAG = "_";
 
 	var path = require("path");
@@ -47,16 +48,30 @@
 	$(function() {
 		app.initWindow();
 
-		$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
-			event.preventDefault();
-			selection.addTag(this["tag_name"].value);
-			this["tag_name"].value = "";
-			this["tag_name"].blur();
+		//$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
+		//	event.preventDefault();
+		//	selection.addTag(this["tag_name"].value);
+		//	this["tag_name"].value = "";
+		//	this["tag_name"].blur();
+		//});
+
+		$("#keymap").on("click", ".node", function(/** @type {jQuery.Event} */ event) {
+			var dir_index = $(this).data("dir_index");
+			if (event.ctrlKey) {
+				selection.toggleDir(dir_index);
+			} else {
+				selection.selectOneDir(dir_index);
+			}
 		});
 
-		$("#keymap").on("click", ".tag .key", function() {
-			var tag_index = $(this).data("tag_index");
-			selection.toggle(images_list.current(), tag_index);
+		$("#select_dir_btn").click(function() {
+			$("#selected_dir").click();
+		});
+		$("#selected_dir").change(function() {
+			if (this.value.length > 0) {
+				selection.setSelectDest(this.value);
+				localStorage[GALLERY_SELECT_DEST + "-" + current_dir.getPath()] = this.value;
+			}
 		});
 
 		$(window)
@@ -77,11 +92,11 @@
 					show(SHOW.PREV);
 
 				} else if (event.shiftKey && event.keyCode == app.keys.DELETE) {
-					selection.addTag("delete");
-					selection.select(images_list.current(), "delete");
+					//selection.addTag("delete");
+					//selection.select(images_list.current(), "delete");
 
 				} else if (event.shiftKey && event.keyCode == app.keys.EQUAL) {
-					$("#new_tag_form").find("input").focus();
+					//$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode == app.keys.ENTER) {
 					var mode = BUILD.TAGGED;
@@ -121,19 +136,23 @@
 					window.location = "index.html";
 
 				} else if (event.keyCode == app.keys.NUMPAD_PLUS) {
-					$("#new_tag_form").find("input").focus();
+					//$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode == app.keys.TILDA) {
 					$("#overlay").fadeToggle("fast");
 
 				} else if (event.keyCode == app.keys.INSERT) {
-					selection.select(images_list.current(), 0);
+					selection.toggleImage(images_list.current());
 
 				} else if (event.keyCode == app.keys.DELETE) {
-					selection.deselect(images_list.current());
+					selection.untagImage(images_list.current());
+					selection.deselectImage(images_list.current());
 
 				} else if (key_index >= 0) {
-					selection.toggle(images_list.current(), key_index);
+					var tag_name = $(".tag_index" + key_index).data("dir_index");
+					if (typeof tag_name === "string") {
+						selection.tagImage(images_list.current(), tag_name);
+					}
 
 				} else {
 					console.info(event.keyCode, String.fromCharCode(event.keyCode));
@@ -143,7 +162,13 @@
 			})
 			.resize(resize);
 
-		current_dir = new Directory(process.cwd());
+		current_dir = new Directory({
+			path: process.cwd()
+		});
+		selection = new Selection(current_dir);
+		selection.on("change", drawKeymap);
+		selection.on("dir-select", showImages);
+		selection.setSelectDest(localStorage[GALLERY_SELECT_DEST + "-" + current_dir.getPath()]);
 
 		image = new Image($("#current_image"));
 		image.on("load", onObjectLoad);
@@ -156,9 +181,6 @@
 		video = new Video($("#current_video"));
 		video.on("load", onObjectLoad);
 		video.setBasePath(current_dir.path);
-
-		selection = new Selection();
-		selection.on("change", drawKeymap);
 
 		$(window).triggerHandler("resize");
 
@@ -183,26 +205,37 @@
 			}
 
 			$("#current_file_panel").empty()
-				.append( $("<span>").text(this.getFile()) )
+				.append( $("<span>", { id: "current_file_name" }).text(this.getFile()) )
 				.append( $("<span>").text( images_list.getPosition(true) + "/" + images_list.length() ) )
 				.append( $("<span>").text(size) );
+			if (selection.imageSelected(images_list.current())) {
+				$("#current_file_name").addClass("selected");
+			} else {
+				$("#current_file_name").removeClass("selected");
+			}
 		}
 	}
 
 	function loadImages() {
 		reset();
-		current_dir.read(function(/** @type {Directory} */ dir) {
-			images_list.setData(dir.images);
-
-			var history_name = GALLERY_HISTORY + "-" + dir.path;
-			view_history = List.from_storage(localStorage, history_name, {
-				maxSize: Math.round(images_list.length() / 2),
-				unique: true
-			});
-
-			selection.setTags(dir.tags);
-			show();
+		current_dir.read(function() {
+			drawKeymap();
+			showImages();
 		});
+	}
+
+	function showImages() {
+		reset();
+		var images = current_dir.getImages(selection.getSelectedDirs());
+		images_list.setData(images);
+
+		var history_name = GALLERY_HISTORY + "-" + current_dir.getPath();
+		view_history = List.from_storage(localStorage, history_name, {
+			maxSize: Math.round(images_list.length() / 2),
+			unique: true
+		});
+
+		show();
 	}
 
 	function reset() {
@@ -213,39 +246,56 @@
 		$("#current_file_panel").text("No image loaded");
 
 		images_list = new List();
+
+		selection.resetImages();
 	}
 
 	function drawKeymap() {
 		var $keymap = $('#keymap').empty();
-		var tags = selection.dumpTags();
-		_.each(tags, function(tag, tag_index) {
-			var text = tag.name;
-			if (tag.images.length > 0) {
-				text += " (" + tag.images.length + ")";
-			}
-			var $tag = $("<div>", { class: "tag" })
-				.text(text)
+		var $selection = $("#selection");
+		var dir_list = selection.getDirList(images_list.current());
+		if (dir_list.length > 40) {
+			$keymap.addClass("compact");
+			$("#selection_panel").append($selection).show();
+		}
+		_.each(dir_list, function(dir) {
+			var $node = $("<div>", { class: "node" })
+				.text(dir.name)
+				.data("dir_index", dir.index)
 				.appendTo(this.$keymap);
-			$("<span>", { class: "key" })
-				.text(tag.key)
-				.data("tag_index", tag_index)
-				.prependTo($tag);
-
-			if (tag.images.indexOf(this.current_image) >= 0) {
-				$tag.addClass("current");
+			$node.addClass("level" + dir.level);
+			if (dir.level === 1 && Selection.TAG_KEYS.length > this.key_index) {
+				$("<span>", { class: "key" })
+					.text(Selection.TAG_KEYS[this.key_index])
+					.addClass("tag_index" + this.key_index)
+					.data("dir_index", dir.index)
+					.prependTo($node);
+				this.key_index++;
+			}
+			if (dir.selected) {
+				$node.addClass("selected");
+			}
+			if (dir.tagged > 0) {
+				$("<span>")
+					.text(" (" + dir.tagged + ")")
+					.appendTo($node);
+			}
+			if (dir.current) {
+				$node.addClass("current");
 			}
 		}, {
 			$keymap: $keymap,
-			current_image: images_list.current()
+			current_image: images_list.current(),
+			key_index: 0
 		});
-
-		var selected_count = _.reduce(tags, function(count, tag) {
-			return count + tag.images.length;
-		}, 0);
-		$("<div>").html("&nbsp;").appendTo($keymap);
-		$("<div>")
-			.text("selected: " + selected_count)
-			.appendTo($keymap);
+		if (selection.imageSelected(images_list.current())) {
+			$("#current_file_name").addClass("selected");
+		} else {
+			$("#current_file_name").removeClass("selected");
+		}
+		$selection.find(".destination").text(selection.getSelectDest());
+		$selection.find(".selected").text(selection.imagesSelected());
+		$selection.find(".tagged").text(selection.imagesTagged());
 	}
 
 	/**
@@ -326,15 +376,15 @@
 
 		var next_image = images_list.getNext();
 		if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {
-			next_image = "file:///" + current_dir.path + "/" + next_image;
+			next_image = current_dir.getUri() + next_image;
 			image_preload.attr("src", next_image);
 		}
 		drawKeymap();
 	}
 
 	/**
-	 * @enum
-	 */
+	* @enum
+	*/
 	var BUILD = {
 		ALL: 0,
 		TAGGED: 1,
@@ -342,8 +392,8 @@
 	};
 
 	/**
-	 * @param {BUILD} mode
-	 */
+	* @param {BUILD} mode
+	*/
 	function build(mode) {
 		var images = selection.dumpImages();
 		if (mode != BUILD.TAGGED) {
@@ -353,7 +403,7 @@
 			}
 			_.each(images_list.toArray().slice(0, count), function(image) {
 				if (!this[image]) {
-					this[image] = DEFAULT_TAG;
+					this[image] = current_dir.getPath() + DEFAULT_TAG + "/";
 				}
 			}, images);
 		}

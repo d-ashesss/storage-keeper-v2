@@ -1,35 +1,57 @@
 var fs = require("fs");
 var path = require("path");
 var _ = require("underscore");
+var async = require("async");
 
 var supported_extensions = [".jpg", ".jpeg", ".png", ".gif", ".apng", ".agif", ".swf", ".webm", ".mp4"];
 
 /**
- * @param {string} path
+ * @param {{
+ *     path: string,
+ *     level: number=,
+ *     max_level: number=
+ * }} options
  * @constructor
  */
-function Directory(path) {
-	this.path = path.replace(/\\/g, "/");
+function Directory(options) {
+	this.path = options.path.replace(/\\/g, "/");
+	if (typeof options.level === "number") {
+		this.level = options.level;
+	}
+	if (typeof options.max_level === "number") {
+		this.max_level = options.max_level;
+	}
 	this.reset();
 }
 module.exports = Directory;
 
 Directory.prototype = {
 	path: "",
+	level: 0,
+	max_level: 2,
 	/** @type {Array.<string>} */
 	images: null,
-	/** @type {Array.<string>} */
+	/** @type {Array.<Directory>} */
 	dirs: null,
-	/** @type {Array.<string>} */
-	tags: null,
 	/** @type {Array.<string>} */
 	other: null,
 
 	reset: function() {
 		this.images = [];
 		this.dirs = [];
-		this.tags = [];
 		this.other = [];
+	},
+
+	getPath: function() {
+		return this.path + "/";
+	},
+
+	getUri: function() {
+		return "file:///" + this.getPath();
+	},
+
+	getName: function() {
+		return path.basename(this.path);
 	},
 
 	/**
@@ -37,44 +59,72 @@ Directory.prototype = {
 	 */
 	read: function(callback) {
 		this.reset();
-		fs.readdir(this.path, (function(err, files) {
-			_.each(files, this.filterFile, this);
-			this.readTags();
-			callback(this);
-		}).bind(this));
+		fs.readdir(this.getPath(), function(err, files) {
+			async.each(files.sort(), this.filterFile.bind(this), function() {
+				callback(this);
+			}.bind(this));
+		}.bind(this));
 	},
 
 	/**
 	 * @param {string} file
+	 * @param {function} callback
 	 */
-	filterFile: function(file) {
+	filterFile: function(file, callback) {
+		var full_path = this.getPath() + file;
 		var ext = path.extname(file).toLowerCase();
 		if (supported_extensions.indexOf(ext) >= 0) {
 			this.images.push(file);
+			callback();
 			return;
 		}
-		var stat = fs.statSync(file);
+		var stat = fs.statSync(full_path);
 		if (stat.isDirectory()) {
-			this.dirs.push(file);
+			if (/^[^a-z0-9\-]/i.test(file) || this.level >= this.max_level) {
+				callback();
+				return;
+			}
+			var dir = new Directory({
+				path: full_path,
+				level: this.level + 1,
+				max_level: this.max_level
+			});
+			this.dirs.push(dir);
+			dir.read(function() {
+				callback();
+			}.bind(this));
 			return;
 		}
 		this.other.push(file);
+		callback();
 	},
 
-	readTags: function() {
-		var pre_tags = path.basename(this.path).split(" ").concat(this.dirs);
-		_.each(pre_tags, function(tag) {
-			if (this.tags.indexOf(tag) < 0 && /^[a-z0-9\-]+$/i.test(tag)) {
-				this.tags.push(tag);
-			}
-		}, this);
+	getImages: function(selected_dirs) {
+		var images = [];
+		if (selected_dirs.indexOf(this.getPath()) >= 0) {
+			images = images.concat(this.images);
+		}
+		_.each(this.dirs, function(dir) {
+			var dir_images = _.map(dir.getImages(selected_dirs), function(image) {
+				return this.getName() + "/" + image;
+			}, dir);
+			images = images.concat(dir_images);
+		});
+		return images;
+	},
+
+	getDirList: function() {
+		var list = [this];
+		_.each(this.dirs, function(dir) {
+			list = list.concat(dir.getDirList());
+		});
+		return list;
 	},
 
 	save: function(files) {
-		_.each(files, function(dir_name, file_name) {
-			var dir_path = this.path + "/" + dir_name;
-			var file_path = this.path + "/" + file_name;
-			var dst_file_path = dir_path + "/" + path.basename(file_name);
+		_.each(files, function(dir_path, file_name) {
+			var file_path = this.getPath() + file_name;
+			var dst_file_path = dir_path + path.basename(file_name);
 			if (!fs.existsSync(dir_path)) {
 				fs.mkdirSync(dir_path);
 			}
