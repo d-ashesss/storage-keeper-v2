@@ -26,6 +26,13 @@ function Directory(options) {
 }
 module.exports = Directory;
 
+Directory.SORT_MODE = /** @enum */ {
+	NORMAL: 0,
+	RANDOM: 1,
+	CREATED: 2,
+	SIZE: 3
+};
+
 Directory.prototype = {
 	path: "",
 	level: 0,
@@ -175,14 +182,4 @@ Directory.prototype = {
 			fs.renameSync(file_path, dst_file_path);
 		}, this);
 	}
-};
-
-/**
- * @enum
- */
-Directory.SORT_MODE = {
-	NORMAL: 0,
-	RANDOM: 1,
-	CREATED: 2,
-	SIZE: 3
 };
