@@ -237,10 +237,12 @@
 	}
 
 	function loadImages() {
+		var $loading = $("#gallery_loading").addClass("active");
 		reset();
 		current_dir.read(function() {
 			drawKeymap();
 			showImages();
+			$loading.removeClass("active");
 		});
 	}
 
