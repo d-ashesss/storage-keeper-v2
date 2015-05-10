@@ -148,6 +148,22 @@
 					selection.untagImage(images_list.current());
 					selection.deselectImage(images_list.current());
 
+				} else if (event.keyCode == app.keys.F1) {
+					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
+					loadImages();
+
+				} else if (event.keyCode == app.keys.F2) {
+					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
+					loadImages();
+
+				} else if (event.keyCode == app.keys.F3) {
+					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
+					loadImages();
+
+				} else if (event.keyCode == app.keys.F4) {
+					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
+					loadImages();
+
 				} else if (key_index >= 0) {
 					var tag_name = $(".tag_index" + key_index).data("dir_index");
 					if (typeof tag_name === "string") {

@@ -21,6 +21,7 @@ function Directory(options) {
 	if (typeof options.max_level === "number") {
 		this.max_level = options.max_level;
 	}
+	this.statCache = {};
 	this.reset();
 }
 module.exports = Directory;
@@ -35,6 +36,10 @@ Directory.prototype = {
 	dirs: null,
 	/** @type {Array.<string>} */
 	other: null,
+	/** @type {Directory.SORT_MODE} */
+	sort_mode: Directory.SORT_MODE.NORMAL,
+	/** @type {Object.<string, fs.Stats>} */
+	statCache: null,
 
 	reset: function() {
 		this.images = [];
@@ -110,7 +115,10 @@ Directory.prototype = {
 			}, dir);
 			images = images.concat(dir_images);
 		});
-		return images;
+		if (this.level > 0) {
+			return images;
+		}
+		return this.sort(images);
 	},
 
 	getDirList: function() {
@@ -119,6 +127,42 @@ Directory.prototype = {
 			list = list.concat(dir.getDirList());
 		});
 		return list;
+	},
+
+	/**
+	 * @param {Directory.SORT_MODE} mode
+	 */
+	setSortMode: function(mode) {
+		this.sort_mode = mode;
+	},
+
+	sort: function(files) {
+		if (this.sort_mode === Directory.SORT_MODE.RANDOM) {
+			return _.shuffle(files);
+		} else if (this.sort_mode === Directory.SORT_MODE.CREATED) {
+			return _.sortBy(files, function(file) {
+				return this.getFileStat(file, "birthtime");
+			}, this);
+		} else if (this.sort_mode === Directory.SORT_MODE.SIZE) {
+			return _.sortBy(files, function(file) {
+				return this.getFileStat(file, "size");
+			}, this).reverse();
+		}
+		return files;
+	},
+
+	getFileStat: function(file_name, stat_name) {
+		var full_path = this.getPath() + file_name;
+		var stat = this.statCache[full_path];
+		if (typeof stat === "undefined") {
+			stat = this.statCache[full_path] = fs.statSync(full_path);
+		}
+		if (typeof stat_name == "undefined") {
+			return stat_name;
+		} else if (typeof stat[stat_name] === "function") {
+			return stat[stat_name].call();
+		}
+		return stat[stat_name];
 	},
 
 	save: function(files) {
@@ -131,4 +175,14 @@ Directory.prototype = {
 			fs.renameSync(file_path, dst_file_path);
 		}, this);
 	}
+};
+
+/**
+ * @enum
+ */
+Directory.SORT_MODE = {
+	NORMAL: 0,
+	RANDOM: 1,
+	CREATED: 2,
+	SIZE: 3
 };

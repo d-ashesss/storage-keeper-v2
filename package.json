@@ -1,7 +1,7 @@
 {
 	"name": "storage-keeper",
 	"main": "index.html",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"single-instance": false,
 	"window": {
 		"toolbar": false,
