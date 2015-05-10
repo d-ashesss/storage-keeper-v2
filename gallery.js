@@ -267,12 +267,15 @@
 	}
 
 	function drawKeymap() {
-		var $keymap = $('#keymap').empty();
+		var $keymap = $("#keymap").empty();
 		var $selection = $("#selection");
 		var dir_list = selection.getDirList(images_list.current());
 		if (dir_list.length > 40) {
 			$keymap.addClass("compact");
 			$("#selection_panel").append($selection).show();
+		}
+		if (dir_list.length > 60) {
+			$keymap.addClass("tiny");
 		}
 		_.each(dir_list, function(dir) {
 			var $node = $("<div>", { class: "node" })

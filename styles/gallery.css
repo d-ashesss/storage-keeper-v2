@@ -91,6 +91,15 @@
 	padding: 0 2px;
 }
 
+#keymap.tiny .node {
+	font-size: .8em;
+	line-height: 13px;
+}
+
+#keymap.tiny .node .key {
+	line-height: 13px;
+}
+
 #current_file_panel > span {
 	margin-right: 10px;
 }
