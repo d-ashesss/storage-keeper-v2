@@ -34,6 +34,8 @@ Selection.prototype = {
 	directory: null,
 	/** @type {Array.<string>} */
 	selectedDirs: null,
+	/** @type {Object.<string, string>} */
+	customTags: null,
 	/** @type {Array.<string>} */
 	selectedImages: null,
 	/** @type {Object.<string, string>} */
@@ -44,6 +46,7 @@ Selection.prototype = {
 	resetImages: function() {
 		this.selectedImages = [];
 		this.taggedImages = {};
+		this.customTags = {};
 	},
 
 	setSelectDest: function(dir_path) {
@@ -68,23 +71,41 @@ Selection.prototype = {
 		return display_path;
 	},
 
+	addTag: function(tag) {
+		var tag_path = this.directory.getPath() + tag + "/";
+		if (_.pluck(this.getDirList(), "index").indexOf(tag_path) < 0) {
+			this.customTags[tag] = tag_path;
+		}
+		this.trigger("change");
+	},
+
+	/**
+	 * @param {string=} current_image
+	 * @returns {Array}
+	 */
 	getDirList: function(current_image) {
 		var current_tag = this.taggedImages[current_image];
+		var custom_tags = _.map(this.customTags, function(tag_path, tag) {
+			return {
+				index: tag_path,
+				name: tag,
+				level: 1,
+				selected: this.dirSelected(tag_path),
+				current: current_tag === tag_path,
+				tagged: this.imagesTagged(tag_path)
+			};
+		}, this);
 		var dir_list = this.directory.getDirList();
 		return _.map(dir_list, function(dir) {
-			var current = false;
-			if (current_tag === dir.getPath()) {
-				current = true;
-			}
 			return {
 				index: dir.getPath(),
 				name: dir.getName(),
 				level: dir.level,
 				selected: this.dirSelected(dir.getPath()),
-				current: current,
+				current: current_tag === dir.getPath(),
 				tagged: this.imagesTagged(dir.getPath())
 			};
-		}, this);
+		}, this).concat(custom_tags);
 	},
 
 	dirSelected: function(path) {
@@ -170,6 +191,10 @@ Selection.prototype = {
 	tagImage: function(path, tag) {
 		if (typeof path !== "string") {
 			return;
+		}
+		var tag_dir = _.findWhere(this.getDirList(), {name: tag});
+		if (typeof tag_dir !== "undefined") {
+			tag = tag_dir.index;
 		}
 		if (typeof this.taggedImages[path] !== "undefined") {
 			var tag_list = this.getSubTagList(tag);

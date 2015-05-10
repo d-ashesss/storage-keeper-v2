@@ -48,12 +48,12 @@
 	$(function() {
 		app.initWindow();
 
-		//$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
-		//	event.preventDefault();
-		//	selection.addTag(this["tag_name"].value);
-		//	this["tag_name"].value = "";
-		//	this["tag_name"].blur();
-		//});
+		$("#new_tag_form").submit(function(/** @type {jQuery.Event} */ event) {
+			event.preventDefault();
+			selection.addTag(this["tag_name"].value);
+			this["tag_name"].value = "";
+			this["tag_name"].blur();
+		});
 
 		$("#keymap").on("click", ".node", function(/** @type {jQuery.Event} */ event) {
 			var dir_index = $(this).data("dir_index");
@@ -92,11 +92,11 @@
 					show(SHOW.PREV);
 
 				} else if (event.shiftKey && event.keyCode == app.keys.DELETE) {
-					//selection.addTag("delete");
-					//selection.select(images_list.current(), "delete");
+					selection.addTag("delete");
+					selection.tagImage(images_list.current(), "delete");
 
 				} else if (event.shiftKey && event.keyCode == app.keys.EQUAL) {
-					//$("#new_tag_form").find("input").focus();
+					$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode == app.keys.ENTER) {
 					var mode = BUILD.TAGGED;
@@ -136,7 +136,7 @@
 					window.location = "index.html";
 
 				} else if (event.keyCode == app.keys.NUMPAD_PLUS) {
-					//$("#new_tag_form").find("input").focus();
+					$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode == app.keys.TILDA) {
 					$("#overlay").fadeToggle("fast");
