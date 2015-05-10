@@ -136,3 +136,11 @@
 	padding-left: 220px;
 	padding-top: 57px;
 }
+
+#gallery_loading:after {
+	content: "☆";
+}
+
+#gallery_loading.active:after {
+	content: "★";
+}
