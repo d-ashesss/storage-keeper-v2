@@ -150,18 +150,22 @@
 
 				} else if (event.keyCode == app.keys.F1) {
 					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
+					$("#gallery_sorting").text("N");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F2) {
 					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
+					$("#gallery_sorting").text("R");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F3) {
 					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
+					$("#gallery_sorting").text("C");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F4) {
 					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
+					$("#gallery_sorting").text("S");
 					loadImages();
 
 				} else if (key_index >= 0) {
