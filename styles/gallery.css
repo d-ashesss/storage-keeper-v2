@@ -1,8 +1,10 @@
 .overlay {
 	position: absolute;
-	margin: 10px;
+	padding: 10px;
 	z-index: 1000;
 	top: 0;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .overlay .panel {
@@ -19,6 +21,11 @@
 .overlay .panel .subtitle {
 	padding: 5px 0;
 	font-size: 1.1em;
+}
+
+.overlay .panel.right {
+	float: right;
+	margin: 0 0 10px 10px;
 }
 
 .fatal_error {
@@ -137,10 +144,10 @@
 	padding-top: 57px;
 }
 
-#gallery_loading:after {
+#loading_indicator:after {
 	content: "☆";
 }
 
-#gallery_loading.active:after {
+#loading_indicator.active:after {
 	content: "★";
 }

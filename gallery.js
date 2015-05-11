@@ -150,22 +150,22 @@
 
 				} else if (event.keyCode == app.keys.F1) {
 					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
-					$("#gallery_sorting").text("N");
+					$("#sorting_indicator").text("N");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F2) {
 					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
-					$("#gallery_sorting").text("R");
+					$("#sorting_indicator").text("R");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F3) {
 					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
-					$("#gallery_sorting").text("C");
+					$("#sorting_indicator").text("C");
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F4) {
 					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
-					$("#gallery_sorting").text("S");
+					$("#sorting_indicator").text("S");
 					loadImages();
 
 				} else if (key_index >= 0) {
@@ -237,7 +237,7 @@
 	}
 
 	function loadImages() {
-		var $loading = $("#gallery_loading").addClass("active");
+		var $loading = $("#loading_indicator").addClass("active");
 		reset();
 		current_dir.read(function() {
 			drawKeymap();
