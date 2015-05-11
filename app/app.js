@@ -75,6 +75,7 @@ App.prototype = {
 		9: 57,
 
 		MENU: 93,
+
 		NUMPAD_ASTERISK: 106,
 		NUMPAD_PLUS: 107,
 		NUMPAD_MINUS: 109,
@@ -93,11 +94,18 @@ App.prototype = {
 		F11: 122,
 		F12: 123,
 
+		COLON: 186,
 		EQUAL: 187,
+		COMA: 188,
 		MINUS: 189,
+		POINT: 190,
 		SLASH: 191,
 		TILDA: 192,
-		BACKSLASH: 220
+
+		SQ_BRACKET_OPEN: 219,
+		BACKSLASH: 220,
+		SQ_BRACKET_CLOSE: 221,
+		QUOTE: 222
 	},
 
 	/** @type {Window} */
