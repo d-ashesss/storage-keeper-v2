@@ -1,6 +1,7 @@
 (function(window, $) {
 	const GALLERY_HISTORY = "gallery-history";
 	const GALLERY_SELECT_DEST = "gallery-select-dest";
+	const GALLERY_BOOKMARKS = "gallery-bookmarks";
 	const DEFAULT_TAG = "_";
 
 	var path = require("path");
@@ -23,6 +24,8 @@
 	var images_list;
 	/** @type {List} */
 	var view_history;
+	/** @type {List} */
+	var bookmarks;
 
 	/** @type {Image} */
 	var image;
@@ -72,6 +75,12 @@
 				selection.setSelectDest(this.value);
 				localStorage[GALLERY_SELECT_DEST + "-" + current_dir.getPath()] = this.value;
 			}
+		});
+
+		$("#bookmarks_panel").on("click", ".bookmark", function() {
+			var image = $(this).data("image");
+			bookmarks.setCurrent(image);
+			show(SHOW.BOOKMARK);
 		});
 
 		$(window)
@@ -168,6 +177,24 @@
 					$("#sorting_indicator").text("S");
 					loadImages();
 
+				} else if (event.keyCode == app.keys.QUOTE) {
+					var current_image = images_list.current();
+					if (!bookmarks.contains(current_image)) {
+						bookmarks.add(current_image);
+					} else {
+						bookmarks.remove(current_image);
+					}
+					drawBookmarks();
+					return;
+
+				} else if (event.keyCode == app.keys.SQ_BRACKET_OPEN) {
+					show(SHOW.BOOKMARK_PREV);
+					return;
+
+				} else if (event.keyCode == app.keys.SQ_BRACKET_CLOSE) {
+					show(SHOW.BOOKMARK_NEXT);
+					return;
+
 				} else if (key_index >= 0) {
 					var tag_name = $(".tag_index" + key_index).data("dir_index");
 					if (typeof tag_name === "string") {
@@ -203,6 +230,8 @@
 		video.setBasePath(current_dir.path);
 
 		$(window).triggerHandler("resize");
+
+		bookmarks = List.from_storage(localStorage, GALLERY_BOOKMARKS + "-" + current_dir.getPath());
 
 		loadImages();
 	});
@@ -250,6 +279,12 @@
 		reset();
 		var images = current_dir.getImages(selection.getSelectedDirs());
 		images_list.setData(images);
+
+		_.each(bookmarks.toArray(), function(bookmark) {
+			if (!images_list.contains(bookmark)) {
+				bookmarks.remove(bookmark);
+			}
+		});
 
 		var history_name = GALLERY_HISTORY + "-" + current_dir.getPath();
 		view_history = List.from_storage(localStorage, history_name, {
@@ -323,6 +358,31 @@
 		$selection.find(".tagged").text(selection.imagesTagged());
 	}
 
+	function drawBookmarks() {
+		var $bookmarks = $("#bookmarks_panel").empty();
+		if (bookmarks.length() > 0) {
+			$bookmarks.show();
+		} else {
+			$bookmarks.hide();
+		}
+		_.each(bookmarks.toArray().reverse(), function(bookmark) {
+			var $bm = $("<div>").appendTo($bookmarks);
+			$("<span>", {class: "bookmark action-link"})
+				.text(bookmark)
+				.data("image", bookmark)
+				.appendTo($bm);
+			if (bookmark === images_list.current()) {
+				$bm.addClass("current");
+			}
+			var index = images_list.indexOf(bookmark);
+			if (index >= 0) {
+				$("<span>", {class: "index"})
+					.text(index + 1)
+					.appendTo($bm);
+			}
+		});
+	}
+
 	/**
 	 * @enum
 	 */
@@ -334,7 +394,10 @@
 		NEXT: 4,
 		RANDOM: 5,
 		HISTORY_PREV: 6,
-		HISTORY_NEXT: 7
+		HISTORY_NEXT: 7,
+		BOOKMARK: 8,
+		BOOKMARK_PREV: 9,
+		BOOKMARK_NEXT: 10
 	};
 
 	/**
@@ -379,10 +442,37 @@
 			images_list.setCurrent(current_image);
 			break;
 
+		case SHOW.BOOKMARK:
+			current_image = bookmarks.current();
+			if (typeof current_image === "undefined") {
+				return;
+			}
+			images_list.setCurrent(current_image);
+			break;
+
+		case SHOW.BOOKMARK_PREV:
+			current_image = bookmarks.prev();
+			images_list.setCurrent(current_image);
+			break;
+
+		case SHOW.BOOKMARK_NEXT:
+			current_image = bookmarks.next();
+			if (typeof current_image === "undefined") {
+				return;
+			}
+			images_list.setCurrent(current_image);
+			break;
+
 		default:
 		}
+
 		if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
 			view_history.add(current_image);
+		}
+		if (bookmarks.contains(current_image)) {
+			bookmarks.setCurrent(current_image);
+		} else {
+			bookmarks.setPosition(bookmarks.length());
 		}
 
 		if (/\.(webm|mp4)$/i.test(current_image)) {
@@ -405,6 +495,7 @@
 			image_preload.attr("src", next_image);
 		}
 		drawKeymap();
+		drawBookmarks();
 	}
 
 	/**

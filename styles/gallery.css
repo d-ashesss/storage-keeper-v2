@@ -151,3 +151,19 @@
 #loading_indicator.active:after {
 	content: "★";
 }
+
+#bookmarks_panel {
+	max-height: 500px;
+}
+
+#bookmarks_panel .index {
+	margin-left: 10px;
+}
+
+#bookmarks_panel .index:before {
+	content: "#";
+}
+
+#bookmarks_panel .current .bookmark {
+	font-weight: bold;
+}
