@@ -179,7 +179,9 @@ Directory.prototype = {
 			if (!fs.existsSync(dir_path)) {
 				fs.mkdirSync(dir_path);
 			}
-			fs.renameSync(file_path, dst_file_path);
+			var content = fs.readFileSync(file_path);
+			fs.writeFileSync(dst_file_path, content);
+			fs.unlink(file_path);
 		}, this);
 	}
 };
