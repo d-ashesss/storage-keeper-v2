@@ -112,9 +112,16 @@ Selection.prototype = {
 		return this.selectedDirs.indexOf(path) >= 0;
 	},
 
-	selectDir: function(path) {
+	_selectDir: function(path) {
 		if (!this.dirSelected(path)) {
 			this.selectedDirs.push(path);
+			return true;
+		}
+		return false;
+	},
+
+	selectDir: function(path) {
+		if (this._selectDir(path)) {
 			this.trigger("change");
 			this.trigger("dir-select");
 			this.resetImages();
@@ -124,6 +131,18 @@ Selection.prototype = {
 	selectOneDir: function(path) {
 		this.selectedDirs = [];
 		this.selectDir(path);
+	},
+
+	selectLevel: function(level) {
+		var dir_list = this.getDirList();
+		_.each(dir_list, function(dir) {
+			if (dir.level >= level) {
+				this._selectDir(dir.index);
+			}
+		}, this);
+		this.trigger("change");
+		this.trigger("dir-select");
+		this.resetImages();
 	},
 
 	deselectDir: function(path) {

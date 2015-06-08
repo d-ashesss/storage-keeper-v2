@@ -60,8 +60,11 @@
 
 		$("#keymap").on("click", ".node", function(/** @type {jQuery.Event} */ event) {
 			var dir_index = $(this).data("dir_index");
+			var dir_level = $(this).data("dir_level");
 			if (event.ctrlKey) {
 				selection.toggleDir(dir_index);
+			} else if (event.shiftKey) {
+				selection.selectLevel(dir_level);
 			} else {
 				selection.selectOneDir(dir_index);
 			}
@@ -322,6 +325,7 @@
 			var $node = $("<div>", { class: "node" })
 				.text(dir.name)
 				.data("dir_index", dir.index)
+				.data("dir_level", dir.level)
 				.appendTo(this.$keymap);
 			$node.addClass("level" + dir.level);
 			if (dir.level === 1 && Selection.TAG_KEYS.length > this.key_index) {
