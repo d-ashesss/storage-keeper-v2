@@ -321,7 +321,9 @@
 			$keymap.addClass("compact");
 			$("#selection_panel").append($selection).show();
 		}
-		if (dir_list.length > 60) {
+		if (dir_list.length > 80) {
+			$keymap.addClass("tiniest");
+		} else if (dir_list.length > 60) {
 			$keymap.addClass("tiny");
 		}
 		_.each(dir_list, function(dir) {

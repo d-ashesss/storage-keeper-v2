@@ -107,6 +107,15 @@
 	line-height: 13px;
 }
 
+#keymap.tiniest .node {
+	font-size: .75em;
+	line-height: 10px;
+}
+
+#keymap.tiniest .node .key {
+	line-height: 10px;
+}
+
 #current_file_panel > span {
 	margin-right: 10px;
 }
