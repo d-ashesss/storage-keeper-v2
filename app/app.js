@@ -144,9 +144,7 @@ App.prototype = {
 		}).bind(this));
 
 		window.jQuery(window).keydown((function(event) {
-			if (event.keyCode == this.keys.F5) {
-				this.reload();
-			} else if (event.keyCode == this.keys.F6) {
+			if (event.keyCode == this.keys.F6) {
 				this.reloadDev();
 			} else if (event.keyCode == this.keys.F11) {
 				this.toggleFullscreen();

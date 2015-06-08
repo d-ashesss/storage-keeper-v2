@@ -180,6 +180,9 @@
 					$("#sorting_indicator").text("S");
 					loadImages();
 
+				} else if (event.keyCode == app.keys.F5) {
+					loadImages();
+
 				} else if (event.keyCode == app.keys.QUOTE) {
 					var current_image = images_list.current();
 					if (!bookmarks.contains(current_image)) {
