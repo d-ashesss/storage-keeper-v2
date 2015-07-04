@@ -64,6 +64,12 @@
 				return;
 			}
 			var dir_index = $(this).data("dir_index");
+			if ($(event.target).is(".key")) {
+				if (typeof dir_index === "string") {
+					selection.tagImage(images_list.current(), dir_index);
+				}
+				return;
+			}
 			var dir_level = $(this).data("dir_level");
 			if (event.ctrlKey) {
 				selection.toggleDir(dir_index);

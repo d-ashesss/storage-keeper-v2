@@ -80,6 +80,9 @@
 	margin-right: 5px;
 	line-height: 17px;
 }
+#keymap .node .key:hover {
+	background-color: #455A64;
+}
 
 #keymap .node.current {
 	font-weight: bold;
@@ -87,7 +90,6 @@
 
 #keymap .node.current .key {
 	font-weight: normal;
-	background-color: #455A64;
 }
 
 #keymap.compact .node {
