@@ -36,7 +36,7 @@ Directory.SORT_MODE = /** @enum */ {
 Directory.prototype = {
 	path: "",
 	level: 0,
-	max_level: 2,
+	max_level: 3,
 	/** @type {Array.<string>} */
 	images: null,
 	/** @type {Array.<Directory>} */

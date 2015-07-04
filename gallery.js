@@ -333,12 +333,14 @@
 				.data("dir_level", dir.level)
 				.appendTo(this.$keymap);
 			$node.addClass("level" + dir.level);
-			if (dir.level === 1 && Selection.TAG_KEYS.length > this.key_index) {
-				$("<span>", { class: "key" })
-					.text(Selection.TAG_KEYS[this.key_index])
-					.addClass("tag_index" + this.key_index)
+			if (dir.level === 1) {
+				var $key = $("<span>", { class: "key" })
 					.data("dir_index", dir.index)
 					.prependTo($node);
+				if (Selection.TAG_KEYS.length > this.key_index) {
+					$key.text(Selection.TAG_KEYS[this.key_index])
+						.addClass("tag_index" + this.key_index);
+				}
 				this.key_index++;
 			}
 			if (dir.selected) {

@@ -53,16 +53,17 @@
 	line-height: 21px;
 }
 
-#keymap .node.level0 {
+#keymap .node.level0,
+#keymap .node.level1 {
 	width: 160px;
 }
-#keymap .node.level1 {
-	padding-left: 15px;
-	width: 145px;
-}
 #keymap .node.level2 {
-	padding-left: 55px;
-	width: 105px;
+	padding-left: 45px;
+	width: 115px;
+}
+#keymap .node.level3 {
+	padding-left: 60px;
+	width: 100px;
 }
 
 #keymap .node.selected {
@@ -70,7 +71,7 @@
 }
 
 #keymap .node .key {
-	padding: 2px;
+	padding: 2px 3px 2px 2px;
 	background-color: #607D8B;
 	color: #FAFAFA;
 	display: inline-block;
@@ -95,7 +96,7 @@
 }
 
 #keymap.compact .node .key {
-	padding: 0 2px;
+	padding: 0 3px 0 2px;
 }
 
 #keymap.tiny .node {
@@ -104,6 +105,7 @@
 }
 
 #keymap.tiny .node .key {
+	padding: 0 3px 0 2px;
 	line-height: 13px;
 }
 
@@ -113,6 +115,7 @@
 }
 
 #keymap.tiniest .node .key {
+	padding: 0 3px 0 2px;
 	line-height: 10px;
 }
 
