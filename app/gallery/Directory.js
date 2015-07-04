@@ -179,6 +179,9 @@ Directory.prototype = {
 		_.each(files, function(dir_path, file_name) {
 			var file_path = this.getPath() + file_name;
 			var dst_file_path = dir_path + path.basename(file_name);
+			if (file_path === dst_file_path) {
+				return;
+			}
 			if (!fs.existsSync(dir_path)) {
 				fs.mkdirSync(dir_path);
 			}
