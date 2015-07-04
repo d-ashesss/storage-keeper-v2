@@ -59,6 +59,10 @@
 		});
 
 		$("#keymap").on("click", ".node", function(/** @type {jQuery.Event} */ event) {
+			if ($(this).is(".foldable")) {
+				$(this).next().toggle();
+				return;
+			}
 			var dir_index = $(this).data("dir_index");
 			var dir_level = $(this).data("dir_level");
 			if (event.ctrlKey) {
@@ -327,24 +331,36 @@
 			$keymap.addClass("tiny");
 		}
 		_.each(dir_list, function(dir) {
+			if (this.$parent.is(".foldable_body") && this.$parent.data("level") >= dir.level) {
+				this.$parent = this.$parent.parent();
+			}
 			var $node = $("<div>", { class: "node" })
 				.text(dir.name)
 				.data("dir_index", dir.index)
 				.data("dir_level", dir.level)
-				.appendTo(this.$keymap);
+				.appendTo(this.$parent);
+			if (dir.foldable) {
+				$node.addClass("foldable");
+				this.$parent = $("<div>")
+					.addClass("foldable_body")
+					.data("level", dir.level)
+					.hide()
+					.appendTo(this.$parent);
+			}
 			$node.addClass("level" + dir.level);
 			if (dir.level === 1) {
 				var $key = $("<span>", { class: "key" })
 					.data("dir_index", dir.index)
 					.prependTo($node);
-				if (Selection.TAG_KEYS.length > this.key_index) {
+				if (Selection.TAG_KEYS.length > this.key_index && !dir.foldable) {
 					$key.text(Selection.TAG_KEYS[this.key_index])
 						.addClass("tag_index" + this.key_index);
+					this.key_index++;
 				}
-				this.key_index++;
 			}
 			if (dir.selected) {
 				$node.addClass("selected");
+				$node.parents(".foldable_body").show();
 			}
 			if (dir.tagged > 0) {
 				$("<span>")
@@ -355,7 +371,7 @@
 				$node.addClass("current");
 			}
 		}, {
-			$keymap: $keymap,
+			$parent: $keymap,
 			current_image: images_list.current(),
 			key_index: 0
 		});

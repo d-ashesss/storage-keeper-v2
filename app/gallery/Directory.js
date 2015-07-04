@@ -72,7 +72,10 @@ Directory.prototype = {
 	read: function(callback) {
 		this.reset();
 		fs.readdir(this.getPath(), function(err, files) {
-			async.each(files.sort(), this.filterFile.bind(this), function() {
+			var sorted_files = _.sortBy(files, function(file) {
+				return file.toLowerCase();
+			});
+			async.each(sorted_files, this.filterFile.bind(this), function() {
 				callback(this);
 			}.bind(this));
 		}.bind(this));
@@ -92,7 +95,7 @@ Directory.prototype = {
 		}
 		var stat = fs.statSync(full_path);
 		if (stat.isDirectory()) {
-			if (/^[^a-z0-9\-]/i.test(file) || this.level >= this.max_level) {
+			if (/^[^a-z0-9\-\[\]]/i.test(file) || this.level >= this.max_level) {
 				callback();
 				return;
 			}

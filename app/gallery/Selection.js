@@ -92,7 +92,8 @@ Selection.prototype = {
 				level: 1,
 				selected: this.dirSelected(tag_path),
 				current: current_tag === tag_path,
-				tagged: this.imagesTagged(tag_path)
+				tagged: this.imagesTagged(tag_path),
+				foldable: false
 			};
 		}, this);
 		var dir_list = this.directory.getDirList();
@@ -103,7 +104,8 @@ Selection.prototype = {
 				level: dir.level,
 				selected: this.dirSelected(dir.getPath()),
 				current: current_tag === dir.getPath(),
-				tagged: this.imagesTagged(dir.getPath())
+				tagged: this.imagesTagged(dir.getPath()),
+				foldable: /^\[.*]$/.test(dir.getName())
 			};
 		}, this).concat(custom_tags);
 	},
