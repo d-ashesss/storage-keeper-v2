@@ -177,24 +177,39 @@ Selection.prototype = {
 	},
 
 	selectImage: function(path) {
-		if (typeof path !== "string") {
-			return;
-		}
-		if (!this.imageSelected(path)) {
-			this.selectedImages.push(path);
+		if (this._selectImage(path)) {
 			this.trigger("change");
 		}
 	},
 
-	deselectImage: function(path) {
+	_selectImage: function(path) {
 		if (typeof path !== "string") {
-			return;
+			return false;
+		}
+		if (!this.imageSelected(path)) {
+			this.selectedImages.push(path);
+			this._untagImage(path);
+			return true;
+		}
+		return false;
+	},
+
+	deselectImage: function(path) {
+		if (this._deselectImage(path)) {
+			this.trigger("change");
+		}
+	},
+
+	_deselectImage: function(path) {
+		if (typeof path !== "string") {
+			return false;
 		}
 		var index = this.selectedImages.indexOf(path);
 		if (index >= 0) {
 			this.selectedImages.splice(index, 1);
-			this.trigger("change");
+			return true;
 		}
+		return false;
 	},
 
 	toggleImage: function(path) {
@@ -210,8 +225,14 @@ Selection.prototype = {
 	},
 
 	tagImage: function(path, tag) {
+		if (this._tagImage(path, tag)) {
+			this.trigger("change");
+		}
+	},
+
+	_tagImage: function(path, tag) {
 		if (typeof path !== "string") {
-			return;
+			return false;
 		}
 		var tag_dir = _.findWhere(this.getDirList(), {name: tag});
 		if (typeof tag_dir !== "undefined") {
@@ -221,23 +242,29 @@ Selection.prototype = {
 			var tag_list = this.getSubTagList(tag);
 			var tag_index = tag_list.indexOf(this.taggedImages[path]);
 			if (tag_index === (tag_list.length - 1)) {
-				this.untagImage(path);
-				return;
+				return this._untagImage(path);
 			}
 			if (tag_index >= 0) {
 				tag = tag_list[tag_index + 1];
 			}
 		}
 		this.taggedImages[path] = tag;
-		this.trigger("change");
+		this._deselectImage(path);
+		return true;
 	},
 
 	untagImage: function(path) {
+		if (this._untagImage(path)) {
+			this.trigger("change");
+		}
+	},
+
+	_untagImage: function(path) {
 		if (typeof path !== "string") {
-			return;
+			return false;
 		}
 		delete this.taggedImages[path];
-		this.trigger("change");
+		return true;
 	},
 
 	imagesTagged: function(only_tag) {
@@ -275,13 +302,12 @@ Selection.prototype = {
 	* @returns {Object.<string, string>}
 	*/
 	dumpImages: function() {
-		if (this.selectedImages.length > 0) {
-			return _.reduce(this.selectedImages, function(images, image) {
-				images[image] = this.selectDest;
-				return images;
-			}, {}, this);
-		}
-		return this.taggedImages;
+		var tagged = _.clone(this.taggedImages);
+		_.reduce(this.selectedImages, function(images, image) {
+			images[image] = this.selectDest;
+			return images;
+		}, tagged, this);
+		return tagged;
 	}
 };
 
