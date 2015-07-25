@@ -234,7 +234,7 @@ Selection.prototype = {
 		if (typeof path !== "string") {
 			return false;
 		}
-		var tag_dir = _.findWhere(this.getDirList(), {name: tag});
+		var tag_dir = _.findWhere(this.getDirList(), { name: tag });
 		if (typeof tag_dir !== "undefined") {
 			tag = tag_dir.index;
 		}
@@ -299,8 +299,8 @@ Selection.prototype = {
 	},
 
 	/**
-	* @returns {Object.<string, string>}
-	*/
+	 * @returns {Object.<string, string>}
+	 */
 	dumpImages: function() {
 		var tagged = _.clone(this.taggedImages);
 		_.reduce(this.selectedImages, function(images, image) {

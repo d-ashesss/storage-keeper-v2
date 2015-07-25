@@ -28,8 +28,7 @@ Frame.prototype = Media.extend({
 	width: 0,
 	height: 0,
 
-	options: {
-	},
+	options: {},
 
 	onload: function() {
 		this.trigger("load", {

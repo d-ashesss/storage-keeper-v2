@@ -270,9 +270,9 @@
 			}
 
 			$("#current_file_panel").empty()
-				.append( $("<span>", { id: "current_file_name" }).text(this.getFile()) )
-				.append( $("<span>").text( images_list.getPosition(true) + "/" + images_list.length() ) )
-				.append( $("<span>").text(size) );
+				.append($("<span>", { id: "current_file_name" }).text(this.getFile()))
+				.append($("<span>").text(images_list.getPosition(true) + "/" + images_list.length()))
+				.append($("<span>").text(size));
 			if (selection.imageSelected(images_list.current())) {
 				$("#current_file_name").addClass("selected");
 			} else {
@@ -400,7 +400,7 @@
 		}
 		_.each(bookmarks.toArray().reverse(), function(bookmark) {
 			var $bm = $("<div>").appendTo($bookmarks);
-			$("<span>", {class: "bookmark action-link"})
+			$("<span>", { class: "bookmark action-link" })
 				.text(bookmark)
 				.data("image", bookmark)
 				.appendTo($bm);
@@ -409,7 +409,7 @@
 			}
 			var index = images_list.indexOf(bookmark);
 			if (index >= 0) {
-				$("<span>", {class: "index"})
+				$("<span>", { class: "index" })
 					.text(index + 1)
 					.appendTo($bm);
 			}
@@ -443,60 +443,60 @@
 
 		var current_image = images_list.current();
 		switch (direction) {
-		case SHOW.FIRST:
-			current_image = images_list.first();
-			break;
+			case SHOW.FIRST:
+				current_image = images_list.first();
+				break;
 
-		case SHOW.LAST:
-			current_image = images_list.last();
-			break;
+			case SHOW.LAST:
+				current_image = images_list.last();
+				break;
 
-		case SHOW.PREV:
-			current_image = images_list.prev();
-			break;
+			case SHOW.PREV:
+				current_image = images_list.prev();
+				break;
 
-		case SHOW.NEXT:
-			current_image = images_list.next();
-			break;
+			case SHOW.NEXT:
+				current_image = images_list.next();
+				break;
 
-		case SHOW.RANDOM:
-			while (view_history.contains(current_image)) {
-				current_image = images_list.random();
-			}
-			break;
+			case SHOW.RANDOM:
+				while (view_history.contains(current_image)) {
+					current_image = images_list.random();
+				}
+				break;
 
-		case SHOW.HISTORY_PREV:
-			current_image = view_history.prev();
-			images_list.setCurrent(current_image);
-			break;
+			case SHOW.HISTORY_PREV:
+				current_image = view_history.prev();
+				images_list.setCurrent(current_image);
+				break;
 
-		case SHOW.HISTORY_NEXT:
-			current_image = view_history.next();
-			images_list.setCurrent(current_image);
-			break;
+			case SHOW.HISTORY_NEXT:
+				current_image = view_history.next();
+				images_list.setCurrent(current_image);
+				break;
 
-		case SHOW.BOOKMARK:
-			current_image = bookmarks.current();
-			if (typeof current_image === "undefined") {
-				return;
-			}
-			images_list.setCurrent(current_image);
-			break;
+			case SHOW.BOOKMARK:
+				current_image = bookmarks.current();
+				if (typeof current_image === "undefined") {
+					return;
+				}
+				images_list.setCurrent(current_image);
+				break;
 
-		case SHOW.BOOKMARK_PREV:
-			current_image = bookmarks.prev();
-			images_list.setCurrent(current_image);
-			break;
+			case SHOW.BOOKMARK_PREV:
+				current_image = bookmarks.prev();
+				images_list.setCurrent(current_image);
+				break;
 
-		case SHOW.BOOKMARK_NEXT:
-			current_image = bookmarks.next();
-			if (typeof current_image === "undefined") {
-				return;
-			}
-			images_list.setCurrent(current_image);
-			break;
+			case SHOW.BOOKMARK_NEXT:
+				current_image = bookmarks.next();
+				if (typeof current_image === "undefined") {
+					return;
+				}
+				images_list.setCurrent(current_image);
+				break;
 
-		default:
+			default:
 		}
 
 		if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
@@ -532,8 +532,8 @@
 	}
 
 	/**
-	* @enum
-	*/
+	 * @enum
+	 */
 	var BUILD = {
 		ALL: 0,
 		TAGGED: 1,
@@ -541,8 +541,8 @@
 	};
 
 	/**
-	* @param {BUILD} mode
-	*/
+	 * @param {BUILD} mode
+	 */
 	function build(mode) {
 		var images = selection.dumpImages();
 		if (mode != BUILD.TAGGED) {

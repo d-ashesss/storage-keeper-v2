@@ -32,8 +32,7 @@ Image.prototype = Media.extend({
 
 	allowFlip: false,
 
-	options: {
-	},
+	options: {},
 
 	defaultFile: "img/blank.png",
 

@@ -57,10 +57,12 @@
 #keymap .node.level1 {
 	width: 160px;
 }
+
 #keymap .node.level2 {
 	padding-left: 45px;
 	width: 115px;
 }
+
 #keymap .node.level3 {
 	padding-left: 60px;
 	width: 100px;
@@ -80,6 +82,7 @@
 	margin-right: 5px;
 	line-height: 17px;
 }
+
 #keymap .node .key:hover {
 	background-color: #455A64;
 }

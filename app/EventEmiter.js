@@ -18,7 +18,7 @@ EventEmiter.prototype = {
 	 * @param {string} event_name
 	 * @param {function} handler
 	 */
-	on: function (event_name, handler) {
+	on: function(event_name, handler) {
 		if (this.events == null) {
 			this.events = {};
 		}
@@ -32,7 +32,7 @@ EventEmiter.prototype = {
 	 * @param {string} event_name
 	 * @param {*=} data
 	 */
-	trigger: function (event_name, data) {
+	trigger: function(event_name, data) {
 		if (this.events == null || !this.events[event_name]) {
 			return;
 		}
