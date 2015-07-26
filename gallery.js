@@ -237,11 +237,7 @@
 
 				} else if (event.keyCode == app.keys.QUOTE) {
 					var current_image = images_list.current();
-					if (!bookmarks.contains(current_image)) {
-						bookmarks.add(current_image);
-					} else {
-						bookmarks.remove(current_image);
-					}
+					bookmarks.toggle(current_image);
 					drawBookmarks();
 					return;
 
@@ -297,9 +293,7 @@
 
 		bookmarks = new Bookmarks(localStorage);
 		var bookmarks_list = localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()];
-		if (bookmarks_list) {
-			bookmarks.setList(bookmarks_list);
-		}
+		bookmarks.setList(bookmarks_list);
 
 		loadImages();
 	});
@@ -566,11 +560,7 @@
 		if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
 			view_history.add(current_image);
 		}
-		if (bookmarks.contains(current_image)) {
-			bookmarks.setCurrent(current_image);
-		} else {
-			bookmarks.setPosition(bookmarks.length());
-		}
+		bookmarks.setCurrent(current_image);
 
 		if (/\.(webm|mp4)$/i.test(current_image)) {
 			video.show(current_image);

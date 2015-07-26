@@ -32,13 +32,17 @@ Bookmarks.prototype = {
 	list: null,
 
 	getName: function() {
-		return this.name;
+		return this.name || "";
 	},
 
 	setList: function(name, images) {
 		this.name = name;
-		this.fullList = this.getList(name);
 		this.list = null;
+		if (!name) {
+			this.fullList = null;
+			return;
+		}
+		this.fullList = this.getList(name);
 		if (typeof images !== "undefined") {
 			this.initList(images);
 		}
@@ -106,6 +110,14 @@ Bookmarks.prototype = {
 		this.list.remove(value);
 	},
 
+	toggle: function(value) {
+		if (!this.contains(value)) {
+			this.add(value);
+		} else {
+			this.remove(value);
+		}
+	},
+
 	current: function() {
 		if (this.list === null) {
 			return;
@@ -124,7 +136,11 @@ Bookmarks.prototype = {
 		if (this.list === null) {
 			return;
 		}
-		this.list.setCurrent(value);
+		if (this.contains(value)) {
+			this.list.setCurrent(value);
+		} else {
+			this.setPosition(this.length());
+		}
 	},
 
 	prev: function() {
