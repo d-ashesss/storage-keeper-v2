@@ -15,7 +15,8 @@
 		"plugin": true
 	},
 	"dependencies": {
-		"underscore": "*",
-		"async": "*"
+		"underscore": "~1.7",
+		"async": "~0.9",
+		"jquery": ">=2.1"
 	}
 }
