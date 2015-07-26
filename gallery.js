@@ -3,6 +3,7 @@
 	const GALLERY_HISTORY_MAX_SIZE = 5000;
 	const GALLERY_SELECT_DEST = "gallery-select-dest";
 	const GALLERY_BOOKMARKS = "gallery-bookmarks";
+	const GALLERY_SORT_MODE = "gallery-sort-mode";
 	const DEFAULT_TAG = "_";
 
 	var path = require("path");
@@ -37,6 +38,12 @@
 	var frame;
 	/** @type {Video} */
 	var video;
+
+	var SORT_MODE_LABEL = {};
+	SORT_MODE_LABEL[Directory.SORT_MODE.NORMAL] = "N";
+	SORT_MODE_LABEL[Directory.SORT_MODE.RANDOM] = "R";
+	SORT_MODE_LABEL[Directory.SORT_MODE.CREATED] = "C";
+	SORT_MODE_LABEL[Directory.SORT_MODE.SIZE] = "S";
 
 	app.onError = function(/** @type {Error} */ error) {
 		var $error_container = $(".panel.fatal_error");
@@ -214,22 +221,26 @@
 
 				} else if (event.keyCode == app.keys.F1) {
 					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
-					$("#sorting_indicator").text("N");
+					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.NORMAL;
+					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.NORMAL]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F2) {
 					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
-					$("#sorting_indicator").text("R");
+					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.RANDOM;
+					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.RANDOM]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F3) {
 					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
-					$("#sorting_indicator").text("C");
+					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.CREATED;
+					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.CREATED]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F4) {
 					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
-					$("#sorting_indicator").text("S");
+					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.SIZE;
+					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.SIZE]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F5) {
@@ -266,6 +277,10 @@
 		current_dir = new Directory({
 			path: process.cwd()
 		});
+		var sort_mode = parseInt(localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()]) || Directory.SORT_MODE.NORMAL;
+		current_dir.setSortMode(/** @type {Directory.SORT_MODE} */ sort_mode);
+		$("#sorting_indicator").text(SORT_MODE_LABEL[sort_mode]);
+
 		selection = new Selection(current_dir);
 		selection.on("change", drawKeymap);
 		selection.on("change", drawBookmarks);
