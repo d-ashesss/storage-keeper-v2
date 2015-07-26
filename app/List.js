@@ -65,6 +65,7 @@ List.prototype = {
 		if (this.length() > 0) {
 			this.position = 0;
 		}
+		this.save();
 	},
 
 	/**
