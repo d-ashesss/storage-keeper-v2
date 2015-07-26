@@ -259,6 +259,20 @@
 	}
 
 	/**
+	 * @return {jQuery}
+	 */
+	function onObjectShow() {
+		return $("#current_file_panel").empty()
+			.append($("<span>", {
+				id: "current_file_name",
+				text: images_list.current()
+			}))
+			.append($("<span>", {
+				text: images_list.getPosition(true) + "/" + images_list.length()
+			}));
+	}
+
+	/**
 	 * @param object
 	 * @this {Media}
 	 */
@@ -269,9 +283,7 @@
 				size += ':' + object.scale + '%';
 			}
 
-			$("#current_file_panel").empty()
-				.append($("<span>", { id: "current_file_name" }).text(this.getFile()))
-				.append($("<span>").text(images_list.getPosition(true) + "/" + images_list.length()))
+			onObjectShow()
 				.append($("<span>").text(size));
 			if (selection.imageSelected(images_list.current())) {
 				$("#current_file_name").addClass("selected");
@@ -293,7 +305,8 @@
 
 	function showImages() {
 		reset();
-		var images = current_dir.getImages(selection.getSelectedDirs());
+		var selected_dirs = selection.getSelectedDirs();
+		var images = current_dir.getImages(selected_dirs);
 		images_list.setData(images);
 
 		_.each(bookmarks.toArray(), function(bookmark) {
@@ -308,7 +321,7 @@
 			unique: true
 		});
 
-		show();
+		setTimeout(show, 1);
 	}
 
 	function reset() {
@@ -527,6 +540,7 @@
 			next_image = current_dir.getUri() + next_image;
 			image_preload.attr("src", next_image);
 		}
+		onObjectShow();
 		drawKeymap();
 		drawBookmarks();
 	}
