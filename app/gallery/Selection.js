@@ -124,8 +124,8 @@ Selection.prototype = {
 
 	selectDir: function(path) {
 		if (this._selectDir(path)) {
-			this.trigger("change");
 			this.trigger("dir-select");
+			this.trigger("change");
 			this.resetImages();
 		}
 	},
@@ -142,8 +142,8 @@ Selection.prototype = {
 				this._selectDir(dir.index);
 			}
 		}, this);
-		this.trigger("change");
 		this.trigger("dir-select");
+		this.trigger("change");
 		this.resetImages();
 	},
 
@@ -151,8 +151,8 @@ Selection.prototype = {
 		var index = this.selectedDirs.indexOf(path);
 		if (index >= 0) {
 			this.selectedDirs.splice(index, 1);
-			this.trigger("change");
 			this.trigger("dir-select");
+			this.trigger("change");
 			this.resetImages();
 		}
 	},
