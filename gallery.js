@@ -4,6 +4,7 @@
 	const GALLERY_SELECT_DEST = "gallery-select-dest";
 	const GALLERY_BOOKMARKS = "gallery-bookmarks";
 	const GALLERY_SORT_MODE = "gallery-sort-mode";
+	const GALLERY_SELECTED_DIRS = "gallery-selected-dirs";
 	const DEFAULT_TAG = "_";
 
 	var path = require("path");
@@ -281,7 +282,8 @@
 		current_dir.setSortMode(/** @type {Directory.SORT_MODE} */ sort_mode);
 		$("#sorting_indicator").text(SORT_MODE_LABEL[sort_mode]);
 
-		selection = new Selection(current_dir);
+		var selected_dirs = List.from_storage(localStorage, GALLERY_SELECTED_DIRS + "-" + current_dir.getPath());
+		selection = new Selection(current_dir, selected_dirs);
 		selection.on("change", drawKeymap);
 		selection.on("change", drawBookmarks);
 		selection.on("dir-select", showImages);

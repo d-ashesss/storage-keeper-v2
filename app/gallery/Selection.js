@@ -6,14 +6,17 @@ var List = require("../List");
 
 /**
  * @param {Directory} directory
+ * @param {List} selected_dirs_list
  * @constructor
  * @extends {EventEmiter}
  */
-function Selection(directory) {
+function Selection(directory, selected_dirs_list) {
 	this.resetImages();
 	this.directory = directory;
-	this.selectedDirs = [];
-	this.selectedDirs.push(directory.getPath());
+	this.selectedDirs = selected_dirs_list;
+	if (this.selectedDirs.length() === 0) {
+		this.selectedDirs.add(directory.getPath());
+	}
 	this.selectDest = directory.getPath();
 }
 module.exports = Selection;
@@ -32,7 +35,7 @@ Selection.getKeyIndex = function(char_code) {
 Selection.prototype = {
 	/** @type {Directory} */
 	directory: null,
-	/** @type {Array.<string>} */
+	/** @type {List} */
 	selectedDirs: null,
 	/** @type {Object.<string, string>} */
 	customTags: null,
@@ -116,7 +119,7 @@ Selection.prototype = {
 
 	_selectDir: function(path) {
 		if (!this.dirSelected(path)) {
-			this.selectedDirs.push(path);
+			this.selectedDirs.add(path);
 			return true;
 		}
 		return false;
@@ -131,7 +134,7 @@ Selection.prototype = {
 	},
 
 	selectOneDir: function(path) {
-		this.selectedDirs = [];
+		this.selectedDirs.setData([]);
 		this.selectDir(path);
 	},
 
@@ -150,7 +153,7 @@ Selection.prototype = {
 	deselectDir: function(path) {
 		var index = this.selectedDirs.indexOf(path);
 		if (index >= 0) {
-			this.selectedDirs.splice(index, 1);
+			this.selectedDirs.remove(path);
 			this.trigger("dir-select");
 			this.trigger("change");
 			this.resetImages();
@@ -169,7 +172,7 @@ Selection.prototype = {
 	 * @returns {Array.<string>}
 	 */
 	getSelectedDirs: function() {
-		return this.selectedDirs;
+		return this.selectedDirs.toArray();
 	},
 
 	imageSelected: function(path) {
