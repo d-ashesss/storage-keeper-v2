@@ -8,7 +8,17 @@
 <title>Storage Keeper Gallery</title>
 
 <div id="overlay" class="overlay">
-	<div id="bookmarks_panel" class="panel right" style="display: none;"></div>
+	<div id="bookmarks_panel" class="panel right">
+		<div class="title">
+			<select id="bookmark_lists"></select>
+			<span class="action-icon add" id="add_bookmark_list"></span>
+			<span class="action-icon filter inactive" id="show_bookmark_list"></span>
+		</div>
+		<form id="new_bookmark_list_form">
+			<label><input name="list_name" type="text" placeholder="New Bookmark List"></label>
+		</form>
+		<div class="list"></div>
+	</div>
 	<div id="system_panel" class="panel right">
 		↓<span id="sorting_indicator">N</span>
 		<span id="loading_indicator"></span>

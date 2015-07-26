@@ -14,6 +14,7 @@ form {
 
 input {
 	margin: 0;
+	padding: 5px 8px;
 }
 
 .hidden {
@@ -40,6 +41,7 @@ input {
 	opacity: .5;
 }
 
+.action-icon.active,
 .action-icon:hover {
 	opacity: 1;
 }

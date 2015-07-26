@@ -170,7 +170,46 @@
 }
 
 #bookmarks_panel {
+}
+
+#bookmarks_panel .title {
+	text-align: right;
+}
+
+#bookmarks_panel form input {
+	box-sizing: border-box;
+	width: 100%;
+}
+
+#bookmarks_panel form {
+	display: none;
+	border-top: 1px solid #BBB;
+	padding: 10px 20px 0 20px;
+	margin: 10px -20px 0 -20px;
+	box-sizing: border-box;
+}
+
+#bookmarks_panel .title select {
+	padding: 5px 10px;
+	margin-right: 20px;
+	min-width: 250px;
+}
+
+#bookmarks_panel .title * {
+	vertical-align: top;
+}
+
+#bookmarks_panel .title .action-icon {
+	margin-top: 6px;
+}
+
+#bookmarks_panel .list {
+	border-top: 1px solid #BBB;
 	max-height: 500px;
+	margin: 10px -20px 0 -20px;
+	padding: 5px 10px 2px 20px;
+	overflow-x: hidden;
+	overflow-y: scroll;
 }
 
 #bookmarks_panel .index {

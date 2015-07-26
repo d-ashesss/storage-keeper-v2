@@ -1,5 +1,6 @@
 (function(window, $) {
 	const GALLERY_HISTORY = "gallery-history";
+	const GALLERY_HISTORY_MAX_SIZE = 5000;
 	const GALLERY_SELECT_DEST = "gallery-select-dest";
 	const GALLERY_BOOKMARKS = "gallery-bookmarks";
 	const DEFAULT_TAG = "_";
@@ -9,11 +10,15 @@
 
 	var app = require("./app/app")(window);
 	var List = require("./app/List");
+	var Bookmarks = require("./app/gallery/Bookmarks");
 	var Directory = require("./app/gallery/Directory");
 	var Selection = require("./app/gallery/Selection");
 	var Image = require("./app/gallery/Image");
 	var Frame = require("./app/gallery/Frame");
 	var Video = require("./app/gallery/Video");
+
+	/** @type {Bookmarks} */
+	var bookmarks;
 
 	/** @type {Directory} */
 	var current_dir;
@@ -24,8 +29,6 @@
 	var images_list;
 	/** @type {List} */
 	var view_history;
-	/** @type {List} */
-	var bookmarks;
 
 	/** @type {Image} */
 	var image;
@@ -90,10 +93,49 @@
 			}
 		});
 
-		$("#bookmarks_panel").on("click", ".bookmark", function() {
+		$("#bookmark_lists").change(function() {
+			bookmarks.setList(this.value, images_list.toArray());
+			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getName();
+			drawBookmarks();
+		});
+
+		$("#add_bookmark_list").click(function() {
+			$("#new_bookmark_list_form").show()
+				.find("input").get(0).focus();
+		});
+
+		$("#show_bookmark_list").click(function() {
+			if ($(this).is(".active")) {
+				showImages();
+			} else if (bookmarks.length() > 0) {
+				$(this).addClass("active");
+				var full_list = images_list.toArray();
+				images_list.setData(bookmarks.filter(full_list));
+				setTimeout(show, 1);
+			}
+		});
+
+		$("#new_bookmark_list_form").submit(function(/** @type {jQuery.Event} */ event) {
+			event.preventDefault();
+			bookmarks.createList(this["list_name"].value);
+			bookmarks.initList(images_list.toArray());
+			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getName();
+			this["list_name"].value = "";
+			this["list_name"].blur();
+			$(this).hide();
+			drawBookmarks();
+		}).keydown(function(/** @type {jQuery.Event} */ event) {
+			if (event.keyCode == app.keys.ESC) {
+				$(this).hide();
+			}
+		});
+
+		$("#bookmarks_panel").find(".list").on("click", ".bookmark", function() {
 			var image = $(this).data("image");
 			bookmarks.setCurrent(image);
 			show(SHOW.BOOKMARK);
+		}).bind("mousewheel", function(/** @type {jQuery.Event} */ event) {
+			event.stopPropagation();
 		});
 
 		$(window)
@@ -230,8 +272,14 @@
 		});
 		selection = new Selection(current_dir);
 		selection.on("change", drawKeymap);
+		selection.on("change", drawBookmarks);
 		selection.on("dir-select", showImages);
 		selection.setSelectDest(localStorage[GALLERY_SELECT_DEST + "-" + current_dir.getPath()]);
+
+		view_history = List.from_storage(localStorage, GALLERY_HISTORY + "-" + current_dir.getPath(), {
+			maxSize: GALLERY_HISTORY_MAX_SIZE,
+			unique: true
+		});
 
 		image = new Image($("#current_image"));
 		image.on("load", onObjectLoad);
@@ -247,7 +295,11 @@
 
 		$(window).triggerHandler("resize");
 
-		bookmarks = List.from_storage(localStorage, GALLERY_BOOKMARKS + "-" + current_dir.getPath());
+		bookmarks = new Bookmarks(localStorage);
+		var bookmarks_list = localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()];
+		if (bookmarks_list) {
+			bookmarks.setList(bookmarks_list);
+		}
 
 		loadImages();
 	});
@@ -308,18 +360,7 @@
 		var selected_dirs = selection.getSelectedDirs();
 		var images = current_dir.getImages(selected_dirs);
 		images_list.setData(images);
-
-		_.each(bookmarks.toArray(), function(bookmark) {
-			if (!images_list.contains(bookmark)) {
-				bookmarks.remove(bookmark);
-			}
-		});
-
-		var history_name = GALLERY_HISTORY + "-" + current_dir.getPath();
-		view_history = List.from_storage(localStorage, history_name, {
-			maxSize: Math.round(images_list.length() / 2),
-			unique: true
-		});
+		bookmarks.initList(images);
 
 		setTimeout(show, 1);
 	}
@@ -330,6 +371,7 @@
 		video.hide();
 
 		$("#current_file_panel").text("No image loaded");
+		$("#show_bookmark_list").removeClass("active");
 
 		images_list = new List();
 
@@ -405,12 +447,14 @@
 	}
 
 	function drawBookmarks() {
-		var $bookmarks = $("#bookmarks_panel").empty();
-		if (bookmarks.length() > 0) {
-			$bookmarks.show();
-		} else {
-			$bookmarks.hide();
-		}
+		var $bookmark_lists = $("#bookmark_lists").empty();
+		$bookmark_lists.append("<option>");
+		_.each(bookmarks.getLists(), function(list) {
+			$bookmark_lists.append($("<option>", { text: list }));
+		});
+		$bookmark_lists.val(bookmarks.getName());
+
+		var $bookmarks = $("#bookmarks_panel").find(".list").empty();
 		_.each(bookmarks.toArray().reverse(), function(bookmark) {
 			var $bm = $("<div>").appendTo($bookmarks);
 			$("<span>", { class: "bookmark action-link" })
@@ -427,6 +471,7 @@
 					.appendTo($bm);
 			}
 		});
+		$bookmarks.toggle($bookmarks.children().length > 0);
 	}
 
 	/**
@@ -475,6 +520,9 @@
 			case SHOW.RANDOM:
 				while (view_history.contains(current_image)) {
 					current_image = images_list.random();
+					if (Math.random() < 0.5) {
+						break;
+					}
 				}
 				break;
 
@@ -498,6 +546,9 @@
 
 			case SHOW.BOOKMARK_PREV:
 				current_image = bookmarks.prev();
+				if (typeof current_image === "undefined") {
+					return;
+				}
 				images_list.setCurrent(current_image);
 				break;
 
