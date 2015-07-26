@@ -52,6 +52,14 @@ input {
 	background-image: url("../img/remove.png");
 }
 
+.filter {
+	background-image: url("../img/filter.png");
+}
+
+.add {
+	background-image: url("../img/add.png");
+}
+
 button {
 	text-transform: uppercase;
 	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
