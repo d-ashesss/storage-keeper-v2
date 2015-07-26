@@ -171,6 +171,7 @@
 					$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode == app.keys.ENTER) {
+					$("#loading_indicator").addClass("active");
 					var mode = BUILD.TAGGED;
 					if (event.shiftKey) {
 						mode = BUILD.VIEWED;
