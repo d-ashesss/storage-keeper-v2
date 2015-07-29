@@ -114,7 +114,7 @@
 
 		$("#bookmark_lists").change(function() {
 			bookmarks.setList(this.value, images_list.toArray());
-			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getName();
+			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 			drawBookmarks();
 		});
 
@@ -138,7 +138,7 @@
 			event.preventDefault();
 			bookmarks.createList(this["list_name"].value);
 			bookmarks.initList(images_list.toArray());
-			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getName();
+			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 			this["list_name"].value = "";
 			this["list_name"].blur();
 			$(this).hide();
@@ -211,6 +211,18 @@
 					} else {
 						bookmarks.toggle(current_image);
 					}
+					drawBookmarks();
+					return;
+
+				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_OPEN) {
+					bookmarks.prevList(images_list.toArray());
+					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
+					drawBookmarks();
+					return;
+
+				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_CLOSE) {
+					bookmarks.nextList(images_list.toArray());
+					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 					drawBookmarks();
 					return;
 
@@ -489,7 +501,7 @@
 		_.each(bookmarks.getLists(), function(list) {
 			$bookmark_lists.append($("<option>", { text: list }));
 		});
-		$bookmark_lists.val(bookmarks.getName());
+		$bookmark_lists.val(bookmarks.getCurrent());
 
 		if (bookmarks.contains(images_list.current())) {
 			$("#toggle_bookmark").removeClass("empty");

@@ -24,24 +24,22 @@ Bookmarks.prototype = {
 	/** @type {List} */
 	listOfLists: null,
 
-	/** @type {string} */
-	name: null,
 	/** @type {List} */
 	fullList: null,
 	/** @type {List} */
 	list: null,
 
-	getName: function() {
-		return this.name || "";
+	getCurrent: function() {
+		return this.listOfLists.current() || "";
 	},
 
 	setList: function(name, images) {
-		this.name = name;
 		this.list = null;
 		if (!name) {
 			this.fullList = null;
 			return;
 		}
+		this.listOfLists.setCurrent(name);
 		this.fullList = this.getList(name);
 		if (typeof images !== "undefined") {
 			this.initList(images);
@@ -87,6 +85,18 @@ Bookmarks.prototype = {
 
 	getLists: function() {
 		return this.listOfLists.toArray();
+	},
+
+	prevList: function(images) {
+		var list = this.listOfLists.prev();
+		this.setList(list, images);
+		return list;
+	},
+
+	nextList: function(images) {
+		var list = this.listOfLists.next();
+		this.setList(list, images);
+		return list;
 	},
 
 	contains: function(value) {
