@@ -138,6 +138,18 @@
 			}
 		});
 
+		$("#toggle_bookmark").click(function() {
+			$(this).toggleClass("empty");
+			var current_image = images_list.current();
+			bookmarks.toggle(current_image);
+			drawBookmarks();
+		});
+
+		$("#toggle_bookmark_list").click(function() {
+			$(this).toggleClass("down");
+			drawBookmarks();
+		});
+
 		$("#bookmarks_panel").find(".list").on("click", ".bookmark", function() {
 			var image = $(this).data("image");
 			bookmarks.setCurrent(image);
@@ -180,6 +192,16 @@
 					}
 					build(mode);
 					loadImages();
+
+				} else if (event.keyCode == app.keys.QUOTE) {
+					var current_image = images_list.current();
+					if (!event.shiftKey) {
+						bookmarks.add(current_image);
+					} else {
+						bookmarks.toggle(current_image);
+					}
+					drawBookmarks();
+					return;
 
 				} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 					return;
@@ -247,12 +269,6 @@
 
 				} else if (event.keyCode == app.keys.F5) {
 					loadImages();
-
-				} else if (event.keyCode == app.keys.QUOTE) {
-					var current_image = images_list.current();
-					bookmarks.toggle(current_image);
-					drawBookmarks();
-					return;
 
 				} else if (event.keyCode == app.keys.SQ_BRACKET_OPEN) {
 					show(SHOW.BOOKMARK_PREV);
@@ -466,7 +482,17 @@
 		});
 		$bookmark_lists.val(bookmarks.getName());
 
+		if (bookmarks.contains(images_list.current())) {
+			$("#toggle_bookmark").removeClass("empty");
+		} else {
+			$("#toggle_bookmark").addClass("empty");
+		}
+
 		var $bookmarks = $("#bookmarks_panel").find(".list").empty();
+		if ($("#toggle_bookmark_list").is(".down")) {
+			$bookmarks.hide();
+			return;
+		}
 		_.each(bookmarks.toArray().reverse(), function(bookmark) {
 			var $bm = $("<div>").appendTo($bookmarks);
 			$("<span>", { class: "bookmark action-link" })

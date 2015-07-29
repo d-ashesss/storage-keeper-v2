@@ -52,7 +52,9 @@ Bookmarks.prototype = {
 		if (this.fullList === null) {
 			return;
 		}
-		this.list = new List();
+		this.list = new List(undefined, {
+			unique: true
+		});
 		var bookmarked = [];
 		_.each(images, function(image) {
 			var filename = path.basename(image);
@@ -78,7 +80,9 @@ Bookmarks.prototype = {
 	},
 
 	getList: function(name) {
-		return List.from_storage(this.localStorage, GALLERY_BOOKMARKS + "-[" + name.toLowerCase() + "]");
+		return List.from_storage(this.localStorage, GALLERY_BOOKMARKS + "-[" + name.toLowerCase() + "]", {
+			unique: true
+		});
 	},
 
 	getLists: function() {
