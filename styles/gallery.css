@@ -161,6 +161,21 @@
 	padding-top: 57px;
 }
 
+#system_panel .status {
+	display: inline-block;
+	line-height: 27px;
+	vertical-align: top;
+	margin: 1px 16px 0 0;
+}
+
+#system_panel .action-icon {
+	margin: 6px 0 3px;
+}
+
+#sorting_indicator:before {
+	content: "↓";
+}
+
 #loading_indicator:after {
 	content: "☆";
 }

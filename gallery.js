@@ -101,6 +101,17 @@
 			}
 		});
 
+		$("#save_directory_state").click(function() {
+			localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = current_dir.getSortMode();
+			selection.saveSelectedDirs();
+		});
+
+		$("#reset_directory_state").click(function() {
+			delete localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()];
+			delete localStorage[GALLERY_SELECTED_DIRS + "-" + current_dir.getPath()];
+			app.reload();
+		});
+
 		$("#bookmark_lists").change(function() {
 			bookmarks.setList(this.value, images_list.toArray());
 			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getName();
@@ -245,25 +256,21 @@
 
 				} else if (event.keyCode == app.keys.F1) {
 					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
-					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.NORMAL;
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.NORMAL]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F2) {
 					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
-					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.RANDOM;
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.RANDOM]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F3) {
 					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
-					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.CREATED;
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.CREATED]);
 					loadImages();
 
 				} else if (event.keyCode == app.keys.F4) {
 					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
-					localStorage[GALLERY_SORT_MODE + "-" + current_dir.getPath()] = Directory.SORT_MODE.SIZE;
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.SIZE]);
 					loadImages();
 
@@ -299,7 +306,9 @@
 		current_dir.setSortMode(/** @type {Directory.SORT_MODE} */ sort_mode);
 		$("#sorting_indicator").text(SORT_MODE_LABEL[sort_mode]);
 
-		var selected_dirs = List.from_storage(localStorage, GALLERY_SELECTED_DIRS + "-" + current_dir.getPath());
+		var selected_dirs = List.from_storage(localStorage, GALLERY_SELECTED_DIRS + "-" + current_dir.getPath(), {
+			autosave: false
+		});
 		selection = new Selection(current_dir, selected_dirs);
 		selection.on("change", drawKeymap);
 		selection.on("change", drawBookmarks);

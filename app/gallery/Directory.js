@@ -146,6 +146,13 @@ Directory.prototype = {
 		this.sort_mode = mode;
 	},
 
+	/**
+	 * @return {Directory.SORT_MODE}
+	 */
+	getSortMode: function() {
+		return this.sort_mode;
+	},
+
 	sort: function(files) {
 		if (this.sort_mode === Directory.SORT_MODE.RANDOM) {
 			return _.shuffle(files);

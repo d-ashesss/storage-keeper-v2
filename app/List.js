@@ -37,6 +37,7 @@ List.prototype = {
 	/** @type {Array} */
 	list: null,
 	options: {
+		autosave: true,
 		addToHead: false,
 		maxSize: 0,
 		unique: false
@@ -65,7 +66,9 @@ List.prototype = {
 		if (this.length() > 0) {
 			this.position = 0;
 		}
-		this.save();
+		if (this.options.autosave) {
+			this.save();
+		}
 	},
 
 	/**
@@ -101,7 +104,9 @@ List.prototype = {
 		if (this.options.maxSize > 0) {
 			this.list.splice(this.options.maxSize);
 		}
-		this.save();
+		if (this.options.autosave) {
+			this.save();
+		}
 	},
 
 	/**
@@ -109,7 +114,9 @@ List.prototype = {
 	 */
 	shift: function() {
 		var value = this.list.shift();
-		this.save();
+		if (this.options.autosave) {
+			this.save();
+		}
 		return value;
 	},
 
@@ -124,7 +131,9 @@ List.prototype = {
 		if (this.options.maxSize > 0) {
 			this.list = this.list.splice(-this.options.maxSize);
 		}
-		this.save();
+		if (this.options.autosave) {
+			this.save();
+		}
 	},
 
 	/**
@@ -132,7 +141,9 @@ List.prototype = {
 	 */
 	pop: function() {
 		var value = this.list.pop();
-		this.save();
+		if (this.options.autosave) {
+			this.save();
+		}
 		return value;
 	},
 
@@ -155,7 +166,9 @@ List.prototype = {
 		var pos = this.indexOf(value);
 		if (pos >= 0) {
 			this.list.splice(pos, 1);
-			this.save();
+			if (this.options.autosave) {
+				this.save();
+			}
 		}
 	},
 

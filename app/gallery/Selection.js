@@ -175,6 +175,10 @@ Selection.prototype = {
 		return this.selectedDirs.toArray();
 	},
 
+	saveSelectedDirs: function() {
+		this.selectedDirs.save();
+	},
+
 	imageSelected: function(path) {
 		return this.selectedImages.indexOf(path) >= 0;
 	},
