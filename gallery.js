@@ -558,6 +558,7 @@
 			return;
 		}
 
+		var random_chance = 0.1;
 		var current_image = images_list.current();
 		switch (direction) {
 			case SHOW.FIRST:
@@ -579,9 +580,10 @@
 			case SHOW.RANDOM:
 				while (view_history.contains(current_image)) {
 					current_image = images_list.random();
-					if (Math.random() < 0.5) {
+					if (Math.random() < random_chance) {
 						break;
 					}
+					random_chance += .05;
 				}
 				break;
 
