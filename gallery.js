@@ -644,7 +644,7 @@
 		}
 
 		var next_image = images_list.getNext();
-		if (next_image != null && !/\.(webm|mp4|swf)$/i.test(next_image)) {
+		if (next_image != null && !/\.(webm|mp4|swf|gif)$/i.test(next_image)) {
 			next_image = current_dir.getUri() + next_image;
 			image_preload.attr("src", next_image);
 		}
