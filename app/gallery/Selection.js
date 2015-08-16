@@ -114,7 +114,7 @@ Selection.prototype = {
 	},
 
 	dirSelected: function(path) {
-		return this.selectedDirs.indexOf(path) >= 0;
+		return this.getSelectedDirs().indexOf(path) >= 0;
 	},
 
 	_selectDir: function(path) {
@@ -172,6 +172,15 @@ Selection.prototype = {
 	 * @returns {Array.<string>}
 	 */
 	getSelectedDirs: function() {
+		var dir_list = this.directory.getDirList().map(function(dir) {
+			return dir.getPath();
+		});
+		var selected = this.selectedDirs.toArray().filter(function(dir) {
+			return dir_list.indexOf(dir) >= 0;
+		});
+		if (selected.length === 0) {
+			return this.directory.getPath();
+		}
 		return this.selectedDirs.toArray();
 	},
 
