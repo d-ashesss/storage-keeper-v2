@@ -1,3 +1,5 @@
+var path = require("path");
+
 var EventEmiter = require("../EventEmiter");
 
 /**
@@ -40,7 +42,8 @@ Media.prototype = {
 			url = this.baseUrl + "/";
 		}
 		if (this.file != null) {
-			return url + this.file;
+			var file_url = url + this.file;
+			return file_url.replace("#", "%23");
 		}
 		return this.defaultFile;
 	},
