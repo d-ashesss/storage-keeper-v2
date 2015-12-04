@@ -3,7 +3,7 @@ var path = require("path");
 var _ = require("underscore");
 var async = require("async");
 
-var supported_extensions = [".jpg", ".jpeg", ".png", ".gif", ".apng", ".agif", ".swf", ".webm", ".mp4"];
+var supported_extensions = [".jpg", ".jpeg", ".png", ".gif", ".apng", ".agif", ".swf", ".webm"/*, ".mp4"*/];
 
 /**
  * @param {{
