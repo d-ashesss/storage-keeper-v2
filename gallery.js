@@ -423,6 +423,7 @@
 		$("#show_bookmark_list").removeClass("active");
 
 		images_list = new List();
+		window.imglist = images_list;
 
 		selection.resetImages();
 	}
