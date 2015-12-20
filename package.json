@@ -1,7 +1,7 @@
 {
 	"name": "storage-keeper",
 	"main": "index.html",
-	"version": "2.7.1",
+	"version": "2.8.0",
 	"single-instance": false,
 	"window": {
 		"toolbar": false,
@@ -18,5 +18,6 @@
 		"underscore": "~1.7",
 		"async": "~0.9",
 		"jquery": ">=2.1"
-	}
+	},
+	"chromium-args": "--ppapi-flash-path=/opt/google/chrome/PepperFlash/libpepflashplayer.so"
 }

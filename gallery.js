@@ -16,6 +16,7 @@
 	var Directory = require("./app/gallery/Directory");
 	var Selection = require("./app/gallery/Selection");
 	var Image = require("./app/gallery/Image");
+	var Flash = require("./app/gallery/Flash");
 	var Frame = require("./app/gallery/Frame");
 	var Video = require("./app/gallery/Video");
 
@@ -35,6 +36,8 @@
 	/** @type {Image} */
 	var image;
 	var image_preload = $("<img>");
+	/** @type {Flash} */
+	var flash;
 	/** @type {Frame} */
 	var frame;
 	/** @type {Video} */
@@ -336,6 +339,10 @@
 		image.on("load", onObjectLoad);
 		image.setBasePath(current_dir.path);
 
+		flash = new Flash($("#current_flash"));
+		flash.on("load", onObjectLoad);
+		flash.setBasePath(current_dir.path);
+
 		frame = new Frame($("#current_frame"));
 		frame.on("load", onObjectLoad);
 		frame.setBasePath(current_dir.path);
@@ -356,6 +363,7 @@
 	function resize() {
 		image.setSize(window.innerWidth, window.innerHeight);
 		video.setSize(window.innerWidth, window.innerHeight);
+		flash.setSize(window.innerWidth, window.innerHeight);
 		frame.setSize(window.innerWidth, window.innerHeight);
 	}
 
@@ -416,6 +424,7 @@
 
 	function reset() {
 		image.hide();
+		flash.hide();
 		frame.hide();
 		video.hide();
 
@@ -633,14 +642,17 @@
 		if (/\.(webm|mp4)$/i.test(current_image)) {
 			video.show(current_image);
 			image.hide();
+			flash.hide();
 			frame.hide();
 		} else if (/\.swf$/i.test(current_image)) {
-			frame.show(current_image);
+			flash.show(current_image);
 			image.hide();
 			video.hide();
+			frame.hide();
 		} else {
 			image.show(current_image, direction == SHOW.RANDOM);
 			video.hide();
+			flash.hide();
 			frame.hide();
 		}
 

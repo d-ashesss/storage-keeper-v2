@@ -155,10 +155,14 @@
 	filter: FlipH;
 }
 
-#current_frame {
+#current_frame, #current_flash {
 	box-sizing: border-box;
 	padding-left: 220px;
 	padding-top: 57px;
+}
+
+#current_flash {
+	text-align: center;
 }
 
 #system_panel .status {
