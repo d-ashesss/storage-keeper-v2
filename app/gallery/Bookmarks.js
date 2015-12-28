@@ -111,6 +111,9 @@ Bookmarks.prototype = {
 			return;
 		}
 		var filename = path.basename(value);
+		if (this.fullList.contains(filename)) {
+			return;
+		}
 		this.fullList.add(filename);
 		this.list.add(value);
 	},
