@@ -219,12 +219,14 @@
 
 				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_OPEN) {
 					bookmarks.prevList(images_list.toArray());
+					bookmarks.setCurrent(images_list.current());
 					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 					drawBookmarks();
 					return;
 
 				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_CLOSE) {
 					bookmarks.nextList(images_list.toArray());
+					bookmarks.setCurrent(images_list.current());
 					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 					drawBookmarks();
 					return;
