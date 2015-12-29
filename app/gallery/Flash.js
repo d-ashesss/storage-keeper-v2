@@ -51,7 +51,7 @@ Flash.prototype = Media.extend({
 		var file_url = this.getFileUrl();
 		if (this.$flash.data("src") != file_url) {
 			this.$flash.data("src", file_url);
-			this.$flash.html('<object><embed src="' + file_url + '"></embed></object>');
+			this.$flash.html('<object><embed width="100%" height="100%" src="' + file_url + '"></embed></object>');
 		}
 		this.onload();
 	},
