@@ -165,7 +165,7 @@ Directory.prototype = {
 				return this.getFileStat(file, "size");
 			}, this).reverse();
 		}
-		return files;
+		return _.sortBy(files, path.basename);
 	},
 
 	getFileStat: function(file_name, stat_name) {
