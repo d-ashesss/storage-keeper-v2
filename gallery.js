@@ -502,7 +502,9 @@
 		} else {
 			$("#current_file_name").removeClass("selected");
 		}
-		$selection.find(".destination").text(selection.getSelectDest());
+		$selection.find(".destination")
+			.text(selection.getSelectDest())
+			.attr("title", selection.selectDest);
 		$selection.find(".selected").text(selection.imagesSelected());
 		$selection.find(".tagged").text(selection.imagesTagged());
 	}
