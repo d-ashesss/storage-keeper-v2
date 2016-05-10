@@ -437,6 +437,7 @@
 		window.imglist = images_list;
 
 		selection.resetImages();
+		bookmarks.clearCache();
 	}
 
 	function drawKeymap() {

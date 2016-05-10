@@ -15,6 +15,7 @@ function Bookmarks(localStorage) {
 	this.listOfLists = List.from_storage(localStorage, GALLERY_BOOKMARKS_LISTS, {
 		unique: true
 	});
+	this.clearCache();
 }
 module.exports = Bookmarks;
 
@@ -29,6 +30,8 @@ Bookmarks.prototype = {
 	/** @type {List} */
 	list: null,
 
+	cache: null,
+
 	getCurrent: function() {
 		return this.listOfLists.current() || "";
 	},
@@ -40,7 +43,9 @@ Bookmarks.prototype = {
 			return;
 		}
 		this.listOfLists.setCurrent(name);
+	console.time('get ' + name);
 		this.fullList = this.getList(name);
+	console.timeEnd('get ' + name);
 		if (typeof images !== "undefined") {
 			this.initList(images);
 		}
@@ -50,20 +55,30 @@ Bookmarks.prototype = {
 		if (this.fullList === null) {
 			return;
 		}
-		this.list = new List(undefined, {
-			unique: true
-		});
-		var bookmarked = [];
-		_.each(images, function(image) {
-			var filename = path.basename(image);
-			var index = this.fullList.indexOf(filename);
-			if (index >= 0 && typeof bookmarked[index] === "undefined") {
-				bookmarked[index] = image;
-			}
-		}, this);
-		this.list.setData(bookmarked.filter(function(i) {
-			return typeof i !== "undefined";
-		}));
+		var name = this.listOfLists.current();
+	console.time('init ' + name);
+		if (typeof this.cache['list_' + name] === "undefined") {
+			this.cache['list_' + name] = new List(undefined, {
+				unique: true
+			});
+			var bookmarked = [];
+			_.each(images, function(image) {
+				var filename = path.basename(image);
+				var index = this.fullList.indexOf(filename);
+				if (index >= 0 && typeof bookmarked[index] === "undefined") {
+					bookmarked[index] = image;
+				}
+			}, this);
+			this.cache['list_' + name].setData(bookmarked.filter(function(i) {
+				return typeof i !== "undefined";
+			}));
+		}
+		this.list = this.cache['list_' + name];
+	console.timeEnd('init ' + name);
+	},
+
+	clearCache: function() {
+		this.cache = {};
 	},
 
 	filter: function(images) {
@@ -78,9 +93,12 @@ Bookmarks.prototype = {
 	},
 
 	getList: function(name) {
-		return List.from_storage(this.localStorage, GALLERY_BOOKMARKS + "-[" + name.toLowerCase() + "]", {
-			unique: true
-		});
+		if (typeof this.cache['full_list_' + name] === "undefined") {
+			this.cache['full_list_' + name] = List.from_storage(this.localStorage, GALLERY_BOOKMARKS + "-[" + name.toLowerCase() + "]", {
+				unique: true
+			});
+		}
+		return this.cache['full_list_' + name];
 	},
 
 	getLists: function() {
