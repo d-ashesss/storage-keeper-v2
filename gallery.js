@@ -207,7 +207,10 @@
 					build(mode);
 					loadImages();
 
-				} else if (event.keyCode == app.keys.QUOTE) {
+				} else if (event.ctrlKey && event.keyCode == app.keys.TILDA) {
+					$("#overlay").fadeToggle("fast");
+
+				} else if (event.keyCode == app.keys.QUOTE || event.keyCode == app.keys.TILDA) {
 					var current_image = images_list.current();
 					if (!event.shiftKey) {
 						bookmarks.add(current_image);
@@ -260,9 +263,6 @@
 
 				} else if (event.keyCode == app.keys.NUMPAD_PLUS) {
 					$("#new_tag_form").find("input").focus();
-
-				} else if (event.keyCode == app.keys.TILDA) {
-					$("#overlay").fadeToggle("fast");
 
 				} else if (event.keyCode == app.keys.INSERT) {
 					selection.toggleImage(images_list.current());
