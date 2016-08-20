@@ -23,6 +23,10 @@ function Video($video, options) {
 		}
 	}).bind(this));
 	this.video.addEventListener("canplay", this.onload.bind(this));
+
+	this.video.addEventListener("volumechange", (function() {
+		this.$video.attr("muted", this.video.muted ? "muted" : null);
+	}).bind(this));
 }
 module.exports = Video;
 
