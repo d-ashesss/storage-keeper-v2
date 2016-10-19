@@ -19,7 +19,7 @@
 		"async": "~0.9",
 		"jquery": ">=2.1"
 	},
-	"chromium-args": "--ppapi-flash-path=/opt/google/chrome/PepperFlash/libpepflashplayer.so",
+	"chromium-args": "--ppapi-flash-path=/usr/lib/PepperFlash/libpepflashplayer.so",
 	"scripts": {
 		"build": "zip --quiet --recurse-paths --exclude storage-keeper.nw --exclude .idea -6 storage-keeper.nw *"
 	}
