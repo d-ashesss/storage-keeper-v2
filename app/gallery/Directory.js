@@ -194,6 +194,10 @@ Directory.prototype = {
 			}
 			var content = fs.readFileSync(file_path);
 			fs.writeFileSync(dst_file_path, content);
+			try {
+				var stat = fs.statSync(file_path);
+				fs.utimesSync(dst_file_path, stat.atime, stat.mtime);
+			} catch (e) {}
 			fs.unlink(file_path);
 		}, this);
 	}
