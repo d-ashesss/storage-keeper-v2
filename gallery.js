@@ -88,7 +88,7 @@
 			if (event.ctrlKey) {
 				selection.toggleDir(dir_index);
 			} else if (event.shiftKey) {
-				selection.selectLevel(dir_level);
+				selection.selectLevel(dir_index, dir_level);
 			} else {
 				selection.selectOneDir(dir_index);
 			}

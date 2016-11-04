@@ -138,13 +138,30 @@ Selection.prototype = {
 		this.selectDir(path);
 	},
 
-	selectLevel: function(level) {
+	selectLevel: function(index, level) {
+		this.selectedDirs.setData([]);
 		var dir_list = this.getDirList();
+
+		var parent = null;
+		_.every(dir_list, function(dir) {
+			if (dir.index == index) {
+				return false;
+			}
+			if (dir.level < level) {
+				parent = dir;
+			}
+			return true;
+		}, this);
+
 		_.each(dir_list, function(dir) {
+			if (parent !== null && dir.index.match(parent.index.replace("[", "\\[")) === null) {
+				return;
+			}
 			if (dir.level >= level) {
 				this._selectDir(dir.index);
 			}
 		}, this);
+
 		this.trigger("dir-select");
 		this.trigger("change");
 		this.resetImages();
