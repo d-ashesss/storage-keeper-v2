@@ -154,7 +154,7 @@ Selection.prototype = {
 		}, this);
 
 		_.each(dir_list, function(dir) {
-			if (parent !== null && dir.index.match(parent.index.replace("[", "\\[")) === null) {
+			if (parent !== null && dir.index.match(parent.index.replace(/\[/g, "\\[")) === null) {
 				return;
 			}
 			if (dir.level >= level) {
