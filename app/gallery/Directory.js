@@ -33,6 +33,16 @@ Directory.SORT_MODE = /** @enum */ {
 	SIZE: 3
 };
 
+Directory.mkdir = function(dir_path) {
+	var parent_path = path.dirname(dir_path);
+	if (!fs.existsSync(parent_path)) {
+		Directory.mkdir(parent_path);
+	}
+	if (!fs.existsSync(dir_path)) {
+		fs.mkdirSync(dir_path);
+	}
+};
+
 Directory.prototype = {
 	path: "",
 	level: 0,
@@ -189,9 +199,7 @@ Directory.prototype = {
 			if (file_path === dst_file_path) {
 				return;
 			}
-			if (!fs.existsSync(dir_path)) {
-				fs.mkdirSync(dir_path);
-			}
+			Directory.mkdir(dir_path);
 			var content = fs.readFileSync(file_path);
 			fs.writeFileSync(dst_file_path, content);
 			try {
