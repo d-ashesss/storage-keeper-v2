@@ -454,7 +454,7 @@
 			$keymap.addClass("tiny");
 		}
 		_.each(dir_list, function(dir) {
-			if (this.$parent.is(".foldable_body") && this.$parent.data("level") >= dir.level) {
+			while (this.$parent.is(".foldable_body") && this.$parent.data("level") >= dir.level) {
 				this.$parent = this.$parent.parent();
 			}
 			var $node = $("<div>", { class: "node" })
