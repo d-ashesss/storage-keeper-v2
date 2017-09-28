@@ -355,7 +355,7 @@
 
 		$(window).triggerHandler("resize");
 
-		bookmarks = new Bookmarks(localStorage);
+		window.bookmarks = bookmarks = new Bookmarks(localStorage);
 		var bookmarks_list = localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()];
 		bookmarks.setList(bookmarks_list);
 
@@ -698,4 +698,26 @@
 		}
 		current_dir.save(images);
 	}
+
+	window.getBookmarkedImages = function(list_name) {
+		var images = images_list.toArray().map(path.basename);
+		var list = bookmarks.getList(list_name).toArray();
+		return images.filter(function(image) {
+			return list.indexOf(image) >= 0;
+		});
+	};
+
+	window.getNotBookmarkedImages = function(list_name) {
+		var images = images_list.toArray().map(path.basename);
+		var list = bookmarks.getList(list_name).toArray();
+		return images.filter(function(image) {
+			return list.indexOf(image) < 0;
+		});
+	};
+
+	window.bookmarkList = function(images) {
+		images.forEach(function(image) {
+			bookmarks.add(image);
+		});
+	};
 })(window, window.jQuery);

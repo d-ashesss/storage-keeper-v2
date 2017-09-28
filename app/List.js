@@ -10,7 +10,7 @@ function List(name, options) {
 	this.name = name;
 	this.list = [];
 
-	if (typeof options != "object") {
+	if (typeof options !== "object") {
 		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
@@ -57,10 +57,10 @@ List.prototype = {
 	 * @param {(Array|string)} data
 	 */
 	setData: function(data) {
-		if (typeof data == "string") {
+		if (typeof data === "string") {
 			data = JSON.parse(data);
 		}
-		if (data != null) {
+		if (data !== null) {
 			this.list = data;
 		}
 		if (this.length() > 0) {
@@ -286,7 +286,7 @@ List.prototype = {
 	},
 
 	save: function() {
-		if (this.storage == null) {
+		if (this.storage === null) {
 			return;
 		}
 		var value = JSON.stringify(this.list);

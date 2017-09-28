@@ -81,10 +81,13 @@ Bookmarks.prototype = {
 		this.cache = {};
 	},
 
-	filter: function(images) {
+	filter: function(images, list) {
+		if (typeof list === "undefined") {
+			list = this.list;
+		}
 		return images.filter(function(image) {
-			return this.list.contains(image);
-		}, this);
+			return this.contains(image);
+		}, list);
 	},
 
 	createList: function(name) {
