@@ -12,7 +12,7 @@ function Frame($frame, options) {
 	this.$frame = $frame;
 	this.frame = $frame.get(0);
 
-	if (typeof options != "object") {
+	if (typeof options !== "object") {
 		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
@@ -39,12 +39,12 @@ Frame.prototype = Media.extend({
 	},
 
 	/**
-	 * @param {string} file
+	 * @param {string|null} file
 	 */
 	setFile: function(file) {
 		this.file = file;
 		var file_url = this.getFileUrl();
-		if (this.frame.src != file_url) {
+		if (this.frame.src !== file_url) {
 			this.frame.src = file_url;
 		}
 		this.onload();

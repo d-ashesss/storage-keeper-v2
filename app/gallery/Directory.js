@@ -184,7 +184,7 @@ Directory.prototype = {
 		if (typeof stat === "undefined") {
 			stat = this.statCache[full_path] = fs.statSync(full_path);
 		}
-		if (typeof stat_name == "undefined") {
+		if (typeof stat_name === "undefined") {
 			return stat_name;
 		} else if (typeof stat[stat_name] === "function") {
 			return stat[stat_name].call();

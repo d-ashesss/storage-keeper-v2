@@ -51,7 +51,7 @@
 
 	app.onError = function(/** @type {Error} */ error) {
 		var $error_container = $(".panel.fatal_error");
-		if ($error_container.length == 0) {
+		if ($error_container.length === 0) {
 			$error_container = $("<div>", { class: "panel fatal_error" }).prependTo("#overlay").click(function() {
 				$(this).remove();
 			});
@@ -147,7 +147,7 @@
 			$(this).hide();
 			drawBookmarks();
 		}).keydown(function(/** @type {jQuery.Event} */ event) {
-			if (event.keyCode == app.keys.ESC) {
+			if (event.keyCode === app.keys.ESC) {
 				$(this).hide();
 			}
 		});
@@ -186,17 +186,17 @@
 				}
 				var key_index = Selection.getKeyIndex(event.keyCode);
 
-				if (event.shiftKey && event.keyCode == app.keys.SPACE) {
+				if (event.shiftKey && event.keyCode === app.keys.SPACE) {
 					show(SHOW.PREV);
 
-				} else if (event.shiftKey && event.keyCode == app.keys.DELETE) {
+				} else if (event.shiftKey && event.keyCode === app.keys.DELETE) {
 					selection.addTag("delete");
 					selection.tagImage(images_list.current(), "delete");
 
-				} else if (event.shiftKey && event.keyCode == app.keys.EQUAL) {
+				} else if (event.shiftKey && event.keyCode === app.keys.EQUAL) {
 					$("#new_tag_form").find("input").focus();
 
-				} else if (event.keyCode == app.keys.ENTER) {
+				} else if (event.keyCode === app.keys.ENTER) {
 					$("#loading_indicator").addClass("active");
 					var mode = BUILD.TAGGED;
 					if (event.shiftKey) {
@@ -207,10 +207,10 @@
 					build(mode);
 					loadImages();
 
-				} else if (event.ctrlKey && event.keyCode == app.keys.TILDA) {
+				} else if (event.ctrlKey && event.keyCode === app.keys.TILDA) {
 					$("#overlay").fadeToggle("fast");
 
-				} else if (event.keyCode == app.keys.QUOTE || event.keyCode == app.keys.TILDA) {
+				} else if (event.keyCode === app.keys.QUOTE || event.keyCode === app.keys.TILDA) {
 					var current_image = images_list.current();
 					if (!event.shiftKey) {
 						bookmarks.add(current_image);
@@ -220,14 +220,14 @@
 					drawBookmarks();
 					return;
 
-				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_OPEN) {
+				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_OPEN) {
 					bookmarks.prevList(images_list.toArray());
 					bookmarks.setCurrent(images_list.current());
 					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
 					drawBookmarks();
 					return;
 
-				} else if (event.shiftKey && event.keyCode == app.keys.SQ_BRACKET_CLOSE) {
+				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_CLOSE) {
 					bookmarks.nextList(images_list.toArray());
 					bookmarks.setCurrent(images_list.current());
 					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
@@ -237,68 +237,68 @@
 				} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 					return;
 
-				} else if (event.keyCode == app.keys.SPACE || event.keyCode == app.keys.PGDOWN) {
+				} else if (event.keyCode === app.keys.SPACE || event.keyCode === app.keys.PGDOWN) {
 					show(SHOW.NEXT);
 
-				} else if (event.keyCode == app.keys.BACKSPACE || event.keyCode == app.keys.PGUP) {
+				} else if (event.keyCode === app.keys.BACKSPACE || event.keyCode === app.keys.PGUP) {
 					show(SHOW.PREV);
 
-				} else if (event.keyCode == app.keys.HOME) {
+				} else if (event.keyCode === app.keys.HOME) {
 					show(SHOW.FIRST);
 
-				} else if (event.keyCode == app.keys.END) {
+				} else if (event.keyCode === app.keys.END) {
 					show(SHOW.LAST);
 
-				} else if (event.keyCode == app.keys.NUMPAD_SLASH || event.keyCode == app.keys.BACKSLASH) {
+				} else if (event.keyCode === app.keys.NUMPAD_SLASH || event.keyCode === app.keys.BACKSLASH) {
 					show(SHOW.RANDOM);
 
-				} else if (event.keyCode == app.keys.NUMPAD_ASTERISK || event.keyCode == app.keys.MINUS) {
+				} else if (event.keyCode === app.keys.NUMPAD_ASTERISK || event.keyCode === app.keys.MINUS) {
 					show(SHOW.HISTORY_PREV);
 
-				} else if (event.keyCode == app.keys.NUMPAD_MINUS || event.keyCode == app.keys.EQUAL) {
+				} else if (event.keyCode === app.keys.NUMPAD_MINUS || event.keyCode === app.keys.EQUAL) {
 					show(SHOW.HISTORY_NEXT);
 
-				} else if (event.keyCode == app.keys.ESC) {
+				} else if (event.keyCode === app.keys.ESC) {
 					window.location = "index.html";
 
-				} else if (event.keyCode == app.keys.NUMPAD_PLUS) {
+				} else if (event.keyCode === app.keys.NUMPAD_PLUS) {
 					$("#new_tag_form").find("input").focus();
 
-				} else if (event.keyCode == app.keys.INSERT) {
+				} else if (event.keyCode === app.keys.INSERT) {
 					selection.toggleImage(images_list.current());
 
-				} else if (event.keyCode == app.keys.DELETE) {
+				} else if (event.keyCode === app.keys.DELETE) {
 					selection.untagImage(images_list.current());
 					selection.deselectImage(images_list.current());
 
-				} else if (event.keyCode == app.keys.F1) {
+				} else if (event.keyCode === app.keys.F1) {
 					current_dir.setSortMode(Directory.SORT_MODE.NORMAL);
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.NORMAL]);
 					loadImages();
 
-				} else if (event.keyCode == app.keys.F2) {
+				} else if (event.keyCode === app.keys.F2) {
 					current_dir.setSortMode(Directory.SORT_MODE.RANDOM);
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.RANDOM]);
 					loadImages();
 
-				} else if (event.keyCode == app.keys.F3) {
+				} else if (event.keyCode === app.keys.F3) {
 					current_dir.setSortMode(Directory.SORT_MODE.CREATED);
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.CREATED]);
 					loadImages();
 
-				} else if (event.keyCode == app.keys.F4) {
+				} else if (event.keyCode === app.keys.F4) {
 					current_dir.setSortMode(Directory.SORT_MODE.SIZE);
 					$("#sorting_indicator").text(SORT_MODE_LABEL[Directory.SORT_MODE.SIZE]);
 					loadImages();
 
-				} else if (event.keyCode == app.keys.F5) {
+				} else if (event.keyCode === app.keys.F5) {
 					loadImages();
 
-				} else if (event.keyCode == app.keys.SQ_BRACKET_OPEN) {
+				} else if (event.keyCode === app.keys.SQ_BRACKET_OPEN) {
 					show(SHOW.BOOKMARK_PREV);
 					return;
 
-				} else if (event.keyCode == app.keys.SQ_BRACKET_CLOSE) {
+				} else if (event.keyCode === app.keys.SQ_BRACKET_CLOSE) {
 					show(SHOW.BOOKMARK_NEXT);
 					return;
 
@@ -390,7 +390,7 @@
 	function onObjectLoad(object) {
 		if (this.isVisible()) {
 			var size = object.width + '×' + object.height;
-			if (typeof object.scale != "undefined") {
+			if (typeof object.scale !== "undefined") {
 				size += ':' + object.scale + '%';
 			}
 
@@ -569,7 +569,7 @@
 	 * @param {SHOW=} direction
 	 */
 	function show(direction) {
-		if (images_list.length() == 0) {
+		if (images_list.length() === 0) {
 			return;
 		}
 
@@ -639,7 +639,7 @@
 			default:
 		}
 
-		if (direction != SHOW.HISTORY_PREV && direction != SHOW.HISTORY_NEXT) {
+		if (direction !== SHOW.HISTORY_PREV && direction !== SHOW.HISTORY_NEXT) {
 			view_history.add(current_image);
 		}
 		bookmarks.setCurrent(current_image);
@@ -655,14 +655,14 @@
 			video.hide();
 			frame.hide();
 		} else {
-			image.show(current_image, direction == SHOW.RANDOM);
+			image.show(current_image, direction === SHOW.RANDOM);
 			video.hide();
 			flash.hide();
 			frame.hide();
 		}
 
 		var next_image = images_list.getNext();
-		if (next_image != null && !/\.(webm|mp4|swf|gif)$/i.test(next_image)) {
+		if (next_image !== null && !/\.(webm|mp4|swf|gif)$/i.test(next_image)) {
 			next_image = current_dir.getUri() + next_image;
 			image_preload.attr("src", next_image);
 		}
@@ -685,9 +685,9 @@
 	 */
 	function build(mode) {
 		var images = selection.dumpImages();
-		if (mode != BUILD.TAGGED) {
+		if (mode !== BUILD.TAGGED) {
 			var count = images_list.getPosition(true);
-			if (mode == BUILD.ALL) {
+			if (mode === BUILD.ALL) {
 				count = images_list.length();
 			}
 			_.each(images_list.toArray().slice(0, count), function(image) {

@@ -12,7 +12,7 @@ function Video($video, options) {
 	this.$video = $video;
 	this.video = $video.get(0);
 
-	if (typeof options != "object") {
+	if (typeof options !== "object") {
 		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
@@ -68,7 +68,7 @@ Video.prototype = Media.extend({
 	setFile: function(file) {
 		this.file = file;
 		var file_url = this.getFileUrl();
-		if (this.video.src != file_url) {
+		if (this.video.src !== file_url) {
 			this.video.src = file_url;
 		}
 		if (file && this.options.autoplay) {

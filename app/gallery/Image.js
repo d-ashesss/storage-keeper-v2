@@ -12,7 +12,7 @@ function Image($image, options) {
 	this.$image = $image;
 	this.image = $image.get(0);
 
-	if (typeof options != "object") {
+	if (typeof options !== "object") {
 		options = {};
 	}
 	this.options = _.extend({}, this.options, options);
@@ -42,7 +42,7 @@ Image.prototype = Media.extend({
 			"margin-left": this.getMargin(this.width, this.image.width)
 		});
 
-		if (this.allowFlip && Math.round(Math.random()) == 1) {
+		if (this.allowFlip && Math.round(Math.random()) === 1) {
 			this.$image.css("-webkit-transform", "scaleX(-1)");
 		} else {
 			this.$image.css("-webkit-transform", "scaleX(1)");
@@ -57,12 +57,12 @@ Image.prototype = Media.extend({
 	},
 
 	/**
-	 * @param {string} file
+	 * @param {string|null} file
 	 */
 	setFile: function(file) {
 		this.file = file;
 		var file_url = this.getFileUrl();
-		if (this.image.src != file_url) {
+		if (this.image.src !== file_url) {
 			this.image.src = file_url;
 		} else {
 			this.onload();

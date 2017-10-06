@@ -144,7 +144,7 @@ Selection.prototype = {
 
 		var parent = null;
 		_.every(dir_list, function(dir) {
-			if (dir.index == index) {
+			if (dir.index === index) {
 				return false;
 			}
 			if (dir.level < level) {

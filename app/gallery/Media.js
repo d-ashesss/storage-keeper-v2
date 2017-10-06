@@ -30,7 +30,7 @@ Media.prototype = {
 
 	setBasePath: function(path) {
 		var url = path;
-		if (url[0] == "/" || /^[a-z]+:/i.test(url)) {
+		if (url[0] === "/" || /^[a-z]+:/i.test(url)) {
 			url = "file:///" + url;
 		}
 		this.baseUrl = url;
@@ -38,10 +38,10 @@ Media.prototype = {
 
 	getFileUrl: function() {
 		var url = "";
-		if (this.baseUrl != null) {
+		if (this.baseUrl !== null) {
 			url = this.baseUrl + "/";
 		}
-		if (this.file != null) {
+		if (this.file !== null) {
 			var file_url = url + this.file;
 			return file_url.replace("#", "%23");
 		}

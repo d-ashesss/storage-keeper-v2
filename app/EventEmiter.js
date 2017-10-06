@@ -19,7 +19,7 @@ EventEmiter.prototype = {
 	 * @param {function} handler
 	 */
 	on: function(event_name, handler) {
-		if (this.events == null) {
+		if (this.events === null) {
 			this.events = {};
 		}
 		if (!this.events[event_name]) {
@@ -33,7 +33,7 @@ EventEmiter.prototype = {
 	 * @param {*=} data
 	 */
 	trigger: function(event_name, data) {
-		if (this.events == null || !this.events[event_name]) {
+		if (this.events === null || !this.events[event_name]) {
 			return;
 		}
 		_.each(this.events[event_name], function(handler) {
