@@ -12,7 +12,7 @@
 
 	var app = require("./app/app")(window);
 	var List = require("./app/List");
-	var Bookmarks = require("./app/gallery/Bookmarks");
+	var Bookmarks2 = require("./app/gallery/Bookmarks2");
 	var Directory = require("./app/gallery/Directory");
 	var Selection = require("./app/gallery/Selection");
 	var Image = require("./app/gallery/Image");
@@ -20,8 +20,8 @@
 	var Frame = require("./app/gallery/Frame");
 	var Video = require("./app/gallery/Video");
 
-	/** @type {Bookmarks} */
-	var bookmarks;
+	/** @type {Bookmarks2} */
+	var bookmarks2;
 
 	/** @type {Directory} */
 	var current_dir;
@@ -43,6 +43,8 @@
 	/** @type {Video} */
 	var video;
 
+	var disabled = false;
+
 	var SORT_MODE_LABEL = {};
 	SORT_MODE_LABEL[Directory.SORT_MODE.NORMAL] = "N";
 	SORT_MODE_LABEL[Directory.SORT_MODE.RANDOM] = "R";
@@ -57,9 +59,13 @@
 			});
 		}
 		$error_container.empty();
-		_.each(error["stack"].split(/\n/), function(line) {
-			return $("<div>").text(line).appendTo($error_container);
-		});
+		if (typeof error["stack"] !== "undefined") {
+			_.each(error["stack"].split(/\n/), function(line) {
+				return $("<div>").text(line).appendTo($error_container);
+			});
+		} else {
+			$("<div>").text(error.message).appendTo($error_container);
+		}
 	};
 
 	$(function() {
@@ -116,9 +122,10 @@
 		});
 
 		$("#bookmark_lists").change(function() {
-			bookmarks.setList(this.value, images_list.toArray());
-			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
-			drawBookmarks();
+			bookmarks2.setList(this.value, images_list.toArray(), function() {
+				localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
+				drawBookmarks();
+			});
 		});
 
 		$("#add_bookmark_list").click(function() {
@@ -129,23 +136,24 @@
 		$("#show_bookmark_list").click(function() {
 			if ($(this).is(".active")) {
 				showImages();
-			} else if (bookmarks.length() > 0) {
+			} else if (bookmarks2.length() > 0) {
 				$(this).addClass("active");
 				var full_list = images_list.toArray();
-				images_list.setData(bookmarks.filter(full_list));
+				images_list.setData(bookmarks2.filter(full_list));
 				setTimeout(show, 1);
 			}
 		});
 
 		$("#new_bookmark_list_form").submit(function(/** @type {jQuery.Event} */ event) {
 			event.preventDefault();
-			bookmarks.createList(this["list_name"].value);
-			bookmarks.initList(images_list.toArray());
-			localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
-			this["list_name"].value = "";
-			this["list_name"].blur();
-			$(this).hide();
-			drawBookmarks();
+			bookmarks2.createList(this["list_name"].value);
+			bookmarks2.initList(images_list.toArray(), function() {
+				localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
+				this["list_name"].value = "";
+				this["list_name"].blur();
+				$(this).hide();
+				drawBookmarks();
+			}.bind(this));
 		}).keydown(function(/** @type {jQuery.Event} */ event) {
 			if (event.keyCode === app.keys.ESC) {
 				$(this).hide();
@@ -155,8 +163,7 @@
 		$("#toggle_bookmark").click(function() {
 			$(this).toggleClass("empty");
 			var current_image = images_list.current();
-			bookmarks.toggle(current_image);
-			drawBookmarks();
+			bookmarks2.toggle(current_image, drawBookmarks);
 		});
 
 		$("#toggle_bookmark_list").click(function() {
@@ -166,7 +173,7 @@
 
 		$("#bookmarks_panel").find(".list").on("click", ".bookmark", function() {
 			var image = $(this).data("image");
-			bookmarks.setCurrent(image);
+			bookmarks2.setCurrent(image);
 			show(SHOW.BOOKMARK);
 		}).bind("mousewheel", function(/** @type {jQuery.Event} */ event) {
 			event.stopPropagation();
@@ -181,7 +188,7 @@
 				}
 			})
 			.keydown(function(/** @type {jQuery.Event} */ event) {
-				if ($(event.target).is("input")) {
+				if ($(event.target).is("input") || (disabled && event.keyCode !== app.keys.F10)) {
 					return;
 				}
 				var key_index = Selection.getKeyIndex(event.keyCode);
@@ -213,29 +220,48 @@
 				} else if (event.keyCode === app.keys.QUOTE || event.keyCode === app.keys.TILDA) {
 					var current_image = images_list.current();
 					if (!event.shiftKey) {
-						bookmarks.add(current_image);
+						bookmarks2.add(current_image, drawBookmarks);
 					} else {
-						bookmarks.toggle(current_image);
+						bookmarks2.toggle(current_image, drawBookmarks);
 					}
-					drawBookmarks();
 					return;
 
 				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_OPEN) {
-					bookmarks.prevList(images_list.toArray());
-					bookmarks.setCurrent(images_list.current());
-					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
-					drawBookmarks();
+					bookmarks2.prevList(images_list.toArray(), function() {
+						bookmarks2.setCurrent(images_list.current());
+						localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
+						drawBookmarks();
+					});
 					return;
 
 				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_CLOSE) {
-					bookmarks.nextList(images_list.toArray());
-					bookmarks.setCurrent(images_list.current());
-					localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks.getCurrent();
-					drawBookmarks();
+					bookmarks2.nextList(images_list.toArray(), function() {
+						bookmarks2.setCurrent(images_list.current());
+						localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
+						drawBookmarks();
+					});
 					return;
 
 				} else if (event.shiftKey || event.ctrlKey || event.altKey) {
 					return;
+
+				} else if (event.keyCode === app.keys.F10) {
+					if (bookmarks2.database) {
+						bookmarks2.database.close();
+						bookmarks2.database = null;
+						disabled = true;
+						$("#overlay").hide();
+						$("#disabled_overlay").show();
+						$("#media_content").fadeTo("slow", 0.5);
+					} else {
+						Bookmarks2.connect(window).onsuccess = function(database){
+							bookmarks2.database = database;
+							$("#overlay").show();
+							$("#disabled_overlay").hide();
+							$("#media_content").fadeTo("slow", 1);
+							disabled = false;
+						};
+					}
 
 				} else if (event.keyCode === app.keys.SPACE || event.keyCode === app.keys.PGDOWN) {
 					show(SHOW.NEXT);
@@ -328,7 +354,6 @@
 		});
 		selection = new Selection(current_dir, selected_dirs);
 		selection.on("change", drawKeymap);
-		selection.on("change", drawBookmarks);
 		selection.on("dir-select", showImages);
 		selection.setSelectDest(localStorage[GALLERY_SELECT_DEST + "-" + current_dir.getPath()]);
 
@@ -355,11 +380,22 @@
 
 		$(window).triggerHandler("resize");
 
-		window.bookmarks = bookmarks = new Bookmarks(localStorage);
 		var bookmarks_list = localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()];
-		bookmarks.setList(bookmarks_list);
 
-		loadImages();
+		var r = Bookmarks2.create(window);
+		r.onsuccess = function(bookmarks) {
+			window.bookmarks2 = bookmarks2 = bookmarks;
+			bookmarks2.setList(bookmarks_list);
+			selection.on("change", drawBookmarks);
+
+			loadImages();
+		};
+		r.onerror = function(error) {
+			app.onError(error);
+			setTimeout(function() {
+				window.location = "index.html";
+			}, 3000);
+		};
 	});
 
 	function resize() {
@@ -367,13 +403,21 @@
 		video.setSize(window.innerWidth, window.innerHeight);
 		flash.setSize(window.innerWidth, window.innerHeight);
 		frame.setSize(window.innerWidth, window.innerHeight);
+		$("#disabled_overlay").css({
+			left: window.innerWidth / 2,
+			top: window.innerHeight / 2
+		});
 	}
 
 	/**
 	 * @return {jQuery}
 	 */
 	function onObjectShow() {
-		return $("#current_file_panel").empty()
+		var panel = $("#current_file_panel");
+		if (!images_list) {
+			return panel;
+		}
+		return panel.empty()
 			.append($("<span>", {
 				id: "current_file_name",
 				text: images_list.current()
@@ -388,6 +432,9 @@
 	 * @this {Media}
 	 */
 	function onObjectLoad(object) {
+		if (!images_list) {
+			return;
+		}
 		if (this.isVisible()) {
 			var size = object.width + '×' + object.height;
 			if (typeof object.scale !== "undefined") {
@@ -419,9 +466,7 @@
 		var selected_dirs = selection.getSelectedDirs();
 		var images = current_dir.getImages(selected_dirs);
 		images_list.setData(images);
-		bookmarks.initList(images);
-
-		setTimeout(show, 1);
+		bookmarks2.initList(images, show);
 	}
 
 	function reset() {
@@ -437,10 +482,13 @@
 		window.imglist = images_list;
 
 		selection.resetImages();
-		bookmarks.clearCache();
+		bookmarks2.clearCache();
 	}
 
 	function drawKeymap() {
+		if (!images_list) {
+			return;
+		}
 		var $keymap = $("#keymap").empty();
 		var $selection = $("#selection");
 		var dir_list = selection.getDirList(images_list.current());
@@ -513,12 +561,12 @@
 	function drawBookmarks() {
 		var $bookmark_lists = $("#bookmark_lists").empty();
 		$bookmark_lists.append("<option>");
-		_.each(bookmarks.getLists(), function(list) {
+		_.each(bookmarks2.getLists(), function(list) {
 			$bookmark_lists.append($("<option>", { text: list }));
 		});
-		$bookmark_lists.val(bookmarks.getCurrent());
+		$bookmark_lists.val(bookmarks2.getCurrent());
 
-		if (bookmarks.contains(images_list.current())) {
+		if (bookmarks2.contains(images_list.current())) {
 			$("#toggle_bookmark").removeClass("empty");
 		} else {
 			$("#toggle_bookmark").addClass("empty");
@@ -529,7 +577,7 @@
 			$bookmarks.hide();
 			return;
 		}
-		_.each(bookmarks.toArray().reverse(), function(bookmark) {
+		_.each(bookmarks2.toArray().reverse(), function(bookmark) {
 			var $bm = $("<div>").appendTo($bookmarks);
 			$("<span>", { class: "bookmark action-link" })
 				.text(bookmark)
@@ -570,6 +618,7 @@
 	 */
 	function show(direction) {
 		if (images_list.length() === 0) {
+			drawBookmarks();
 			return;
 		}
 
@@ -613,7 +662,7 @@
 				break;
 
 			case SHOW.BOOKMARK:
-				current_image = bookmarks.current();
+				current_image = bookmarks2.current();
 				if (typeof current_image === "undefined") {
 					return;
 				}
@@ -621,7 +670,7 @@
 				break;
 
 			case SHOW.BOOKMARK_PREV:
-				current_image = bookmarks.prev();
+				current_image = bookmarks2.prev();
 				if (typeof current_image === "undefined") {
 					return;
 				}
@@ -629,7 +678,7 @@
 				break;
 
 			case SHOW.BOOKMARK_NEXT:
-				current_image = bookmarks.next();
+				current_image = bookmarks2.next();
 				if (typeof current_image === "undefined") {
 					return;
 				}
@@ -642,7 +691,7 @@
 		if (direction !== SHOW.HISTORY_PREV && direction !== SHOW.HISTORY_NEXT) {
 			view_history.add(current_image);
 		}
-		bookmarks.setCurrent(current_image);
+		bookmarks2.setCurrent(current_image);
 
 		if (/\.(webm|mp4)$/i.test(current_image)) {
 			video.show(current_image);
@@ -699,25 +748,43 @@
 		current_dir.save(images);
 	}
 
-	window.getBookmarkedImages = function(list_name) {
+	window.getBookmarkedImages = function(list_name, callback) {
 		var images = images_list.toArray().map(path.basename);
-		var list = bookmarks.getList(list_name).toArray();
-		return images.filter(function(image) {
-			return list.indexOf(image) >= 0;
+		bookmarks2.getList(list_name, function(list) {
+			var filtered = images.filter(function(image) {
+				return list.indexOf(image) >= 0;
+			});
+			if (callback) callback(filtered);
 		});
 	};
 
-	window.getNotBookmarkedImages = function(list_name) {
+	window.getNotBookmarkedImages = function(list_name, callback) {
 		var images = images_list.toArray().map(path.basename);
-		var list = bookmarks.getList(list_name).toArray();
-		return images.filter(function(image) {
-			return list.indexOf(image) < 0;
+		bookmarks2.getList(list_name, function(list) {
+			var filtered = images.filter(function(image) {
+				return list.indexOf(image) < 0;
+			});
+			if (callback) callback(filtered);
 		});
 	};
 
-	window.bookmarkList = function(images) {
+	window.bookmarkList = function(images, list) {
+		if (typeof list === "undefined") {
+			list = bookmarks2.getCurrent();
+		}
+		var tx = bookmarks2.database.transaction("bookmarks", "readwrite");
 		images.forEach(function(image) {
-			bookmarks.add(image);
+			tx.objectStore("bookmarks").add({
+				name: image,
+				list: list
+			});
 		});
+		tx.oncomplete = function() {
+			console.log("done");
+		};
+	};
+
+	window.rd = function() {
+		app.reloadDev();
 	};
 })(window, window.jQuery);

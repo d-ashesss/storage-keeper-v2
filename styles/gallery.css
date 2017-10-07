@@ -34,6 +34,10 @@
 	cursor: default;
 }
 
+#disabled_overlay {
+	display: none;
+}
+
 #new_tag_form {
 	margin-bottom: 10px;
 }
