@@ -63,13 +63,28 @@
 }
 
 #keymap .node.level2 {
-	padding-left: 45px;
-	width: 115px;
+	padding-left: 40px;
+	width: 120px;
 }
 
 #keymap .node.level3 {
+	padding-left: 50px;
+	width: 110px;
+}
+
+#keymap .node.level4 {
 	padding-left: 60px;
 	width: 100px;
+}
+
+#keymap .node.level5 {
+	padding-left: 70px;
+	width: 90px;
+}
+
+#keymap .node.level6 {
+	padding-left: 80px;
+	width: 80px;
 }
 
 #keymap .node.selected {
