@@ -122,9 +122,11 @@
 		});
 
 		$("#bookmark_lists").change(function() {
+			var $loading = $("#loading_indicator").addClass("active");
 			bookmarks2.setList(this.value, images_list.toArray(), function() {
 				localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
 				drawBookmarks();
+				$loading.removeClass("active");
 			});
 		});
 
@@ -139,8 +141,12 @@
 			} else if (bookmarks2.length() > 0) {
 				$(this).addClass("active");
 				var full_list = images_list.toArray();
-				images_list.setData(bookmarks2.filter(full_list));
-				setTimeout(show, 1);
+				var $loading = $("#loading_indicator").addClass("active");
+				setTimeout(function() {
+					images_list.setData(bookmarks2.filter(full_list));
+					$loading.removeClass("active");
+					setTimeout(show, 1);
+				}, 100);
 			}
 		});
 
@@ -167,8 +173,12 @@
 		});
 
 		$("#toggle_bookmark_list").click(function() {
+			var $loading = $("#loading_indicator").addClass("active");
 			$(this).toggleClass("down");
-			drawBookmarks();
+			setTimeout(function() {
+				drawBookmarks();
+				$loading.removeClass("active");
+			}, 100);
 		});
 
 		$("#bookmarks_panel").find(".list").on("click", ".bookmark", function() {
@@ -192,6 +202,7 @@
 					return;
 				}
 				var key_index = Selection.getKeyIndex(event.keyCode);
+				var $loading = $("#loading_indicator");
 
 				if (event.shiftKey && event.keyCode === app.keys.SPACE) {
 					show(SHOW.PREV);
@@ -204,7 +215,7 @@
 					$("#new_tag_form").find("input").focus();
 
 				} else if (event.keyCode === app.keys.ENTER) {
-					$("#loading_indicator").addClass("active");
+					$loading.addClass("active");
 					var mode = BUILD.TAGGED;
 					if (event.shiftKey) {
 						mode = BUILD.VIEWED;
@@ -227,18 +238,22 @@
 					return;
 
 				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_OPEN) {
+					$loading.addClass("active");
 					bookmarks2.prevList(images_list.toArray(), function() {
 						bookmarks2.setCurrent(images_list.current());
 						localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
 						drawBookmarks();
+						$loading.removeClass("active");
 					});
 					return;
 
 				} else if (event.shiftKey && event.keyCode === app.keys.SQ_BRACKET_CLOSE) {
+					$loading.addClass("active");
 					bookmarks2.nextList(images_list.toArray(), function() {
 						bookmarks2.setCurrent(images_list.current());
 						localStorage[GALLERY_BOOKMARKS + "-" + current_dir.getPath()] = bookmarks2.getCurrent();
 						drawBookmarks();
+						$loading.removeClass("active");
 					});
 					return;
 
@@ -456,17 +471,21 @@
 		reset();
 		current_dir.read(function() {
 			drawKeymap();
-			showImages();
 			$loading.removeClass("active");
+			showImages();
 		});
 	}
 
 	function showImages() {
+		var $loading = $("#loading_indicator").addClass("active");
 		reset();
 		var selected_dirs = selection.getSelectedDirs();
 		var images = current_dir.getImages(selected_dirs);
 		images_list.setData(images);
-		bookmarks2.initList(images, show);
+		bookmarks2.initList(images, function() {
+			$loading.removeClass("active");
+			show();
+		});
 	}
 
 	function reset() {
