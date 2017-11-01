@@ -199,6 +199,19 @@ Directory.prototype = {
 			if (file_path === dst_file_path) {
 				return;
 			}
+			try {
+				fs.statSync(dst_file_path);
+			} catch (e) {
+				return;
+			}
+			throw new Error("File '" + path.basename(file_name) + "' already exists in '" + dir_path + "'");
+		}, this);
+		_.each(files, function(dir_path, file_name) {
+			var file_path = this.getPath() + file_name;
+			var dst_file_path = dir_path + path.basename(file_name);
+			if (file_path === dst_file_path) {
+				return;
+			}
 			Directory.mkdir(dir_path);
 			var content = fs.readFileSync(file_path);
 			fs.writeFileSync(dst_file_path, content);
